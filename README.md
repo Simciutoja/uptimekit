@@ -36,7 +36,7 @@ UptimeKit is designed to be the all-in-one solution for tracking your services' 
 - 🏢 **Organizations** - Multi-tenant support with team management.
 - 📈 **Analytics** - Detailed uptime and response time metrics.
 - 🛠️ **Self-Hostable** - Full control over your data and infrastructure.
-- 🔗 **Istatus Integration** - Display monitors from external instatus pages on your status page,
+- 🔗 **Instatus Integration** - Display monitors from external instatus pages on your status page,
 
 ## How it works
 
