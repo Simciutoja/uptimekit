@@ -98,6 +98,7 @@ export interface Monitor {
 	duration: string;
 	usedOn: number;
 	frequency: string;
+	type: string;
 	hasIncident: boolean;
 	activeIncidentId?: string | null;
 	active: boolean;
@@ -229,6 +230,7 @@ export function MonitorsTable() {
 								? "Maintenance"
 								: "Pending",
 			statusReason: (m as any).statusReason ?? null,
+			type: (m as any).type ?? null,
 			duration: ((monitor: any) => {
 				if (monitor.status === "up") {
 					if (monitor.lastStatusChange) {
@@ -373,6 +375,8 @@ export function MonitorsTable() {
 							monitor.status === "maintenance" &&
 								"bg-blue-500 shadow-blue-500/20",
 							monitor.status === "pending" && "bg-zinc-500 shadow-zinc-500/20",
+							monitor.type === "instatus" &&
+								"bg-purple-500 shadow-purple-500/20",
 						)}
 					/>
 
@@ -380,11 +384,13 @@ export function MonitorsTable() {
 						<span className="flex items-center gap-2 font-semibold leading-none transition-colors group-hover:text-primary">
 							{monitor.name}
 
-							{!monitor.active && (
-								<span className="rounded-full bg-muted px-2 py-0.5 font-medium text-[10px] text-muted-foreground">
-									{getPauseLabel(monitor.pauseReason)}
-								</span>
-							)}
+							{!monitor.active ||
+								monitor.type === "instatus" ||
+								(monitor && (
+									<span className="rounded-full bg-muted px-2 py-0.5 font-medium text-[10px] text-muted-foreground">
+										{getPauseLabel(monitor.pauseReason)}
+									</span>
+								))}
 
 							{monitor.tags && monitor.tags.length > 0 && (
 								<div className="flex items-center gap-1">
@@ -412,12 +418,17 @@ export function MonitorsTable() {
 									monitor.status === "degraded" && "text-amber-500",
 									monitor.status === "maintenance" && "text-blue-500",
 									monitor.status === "pending" && "text-zinc-500",
+									monitor.type === "instatus" && "text-purple-500",
 								)}
 							>
-								{monitor.statusText}
+								{monitor.type === "instatus" ? "External" : monitor.statusText}
 							</span>
-							<span>·</span>
-							<span>{monitor.duration}</span>
+							{!(monitor.type === "instatus") && (
+								<>
+									<span>·</span>
+									<span>{monitor.duration}</span>
+								</>
+							)}
 							<span>·</span>
 							<span className="underline decoration-muted-foreground/50 decoration-dashed underline-offset-2 transition-colors hover:text-foreground">
 								Used on {monitor.usedOn} status page
@@ -452,7 +463,10 @@ export function MonitorsTable() {
 				)}
 			</TableCell>
 
-			<TableCell className="relative w-[100px] font-medium text-muted-foreground text-sm">
+			<TableCell
+				className="relative w-[100px] font-medium text-muted-foreground text-sm"
+				hidden={monitor.type === "instatus"}
+			>
 				<Link
 					href={`/monitors/${monitor.id}`}
 					className="absolute inset-0 z-0"
@@ -476,7 +490,10 @@ export function MonitorsTable() {
 					aria-label={`Open ${monitor.name}`}
 				/>
 
-				<div className="pointer-events-none absolute inset-0 z-20">
+				<div
+					className="pointer-events-none absolute inset-0 z-20"
+					hidden={monitor.type === "instatus"}
+				>
 					<LatencySparkline data={sparklineData?.[monitor.id] ?? []} />
 				</div>
 			</TableCell>
