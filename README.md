@@ -60,18 +60,18 @@ Follow these steps to get UptimeKit running locally on your machine.
     curl -o docker-compose.yml https://raw.githubusercontent.com/uptimekit/uptimekit/main/docker-compose.yml && curl -L https://raw.githubusercontent.com/uptimekit/uptimekit/refs/heads/main/.env.example -o .env
     ```
 
-2. **Edit these vaiables**
+2. **Edit these variables in the .env**
   ```bash
-    BETTER_AUTH_SECRET=change_me_to_a_secure_secret
-    BETTER_AUTH_URL=http://localhost:3000
-    NEXT_PUBLIC_URL=http://localhost:3000
+  BETTER_AUTH_SECRET=change_me_to_a_secure_secret
+  BETTER_AUTH_URL=http://localhost:3000
+  NEXT_PUBLIC_URL=http://localhost:3000
 
-    # Status Page Configuration (Optional)
-    NEXT_PUBLIC_STATUS_PAGE_DOMAIN=status.example.com
+  # Status Page Configuration (Optional)
+  NEXT_PUBLIC_STATUS_PAGE_DOMAIN=status.example.com
 
-    # Optional ports to be exposed
-    DASH_PORT=3000
-    STATUS_PAGE_PORT=3001
+  # Optional ports to be exposed
+  DASH_PORT=3000
+  STATUS_PAGE_PORT=3001
   ```
 
 3. **Start the docker compose**
