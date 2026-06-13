@@ -36,23 +36,12 @@ UptimeKit is designed to be the all-in-one solution for tracking your services' 
 - 🏢 **Organizations** - Multi-tenant support with team management.
 - 📈 **Analytics** - Detailed uptime and response time metrics.
 - 🛠️ **Self-Hostable** - Full control over your data and infrastructure.
+- 🔗 **Istatus Integration** - Display monitors from external instatus pages on your status page,
 
 ## How it works
 
 Uptimekit is a distributed monitoring solution. You can have as many workers as you want and as many replicas of the app as you want.
 The workers check with the app every 15 seconds to get their assigned monitors and run the checks whenever they have to.
-
-## 🚀 Tech Stack
-
-Built with a modern, type-safe stack for maximum performance and developer experience.
-
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Database**: [PostgreSQL](https://www.postgresql.org/) with [Drizzle ORM](https://orm.drizzle.team/) & [ClickHouse](https://clickhouse.com/) & [TimescaleDB](https://www.timescale.com/)
-- **Styling**: [TailwindCSS](https://tailwindcss.com/) & [shadcn/ui](https://ui.shadcn.com/)
-- **Authentication**: [Better-Auth](https://better-auth.com/)
-- **API**: [oRPC](https://orpc.unstack.io/) & [OpenAPI](https://www.openapis.org/)
-- **Monorepo**: [Turborepo](https://turbo.build/)
 
 ## 🛠️ Getting Started
 
@@ -60,21 +49,35 @@ Follow these steps to get UptimeKit running locally on your machine.
 
 ### Prerequisites
 - Redis
-- Clickhouse/Timescale
 - PostgreSQL
+- Clickhouse (optional)
 
 ### Install
 
-1. **Download the docker-compose.yml**
+1. **Download the docker-compose.yml and .env.example**
 
     ```bash
-    curl -o docker-compose.yml https://raw.githubusercontent.com/uptimekit/uptimekit/main/docker-compose.yml
+    curl -o docker-compose.yml https://raw.githubusercontent.com/uptimekit/uptimekit/main/docker-compose.yml && curl -L https://raw.githubusercontent.com/uptimekit/uptimekit/refs/heads/main/.env.example -o .env
     ```
+
+2. **Edit these vaiables**
+  ```bash
+BETTER_AUTH_SECRET=change_me_to_a_secure_secret
+BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_URL=http://localhost:3000
+
+# Status Page Configuration (Optional)
+NEXT_PUBLIC_STATUS_PAGE_DOMAIN=status.example.com
+
+# Optional ports to be exposed
+DASH_PORT=3000
+STATUS_PAGE_PORT=3001
+  ```
 
 2. **Start the docker compose**
 
     ```bash
-    docker-compose up -d
+    docker compose up -d
     ```
 
 3. Now follow the steps on the app. Enjoy :D
