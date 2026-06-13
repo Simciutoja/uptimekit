@@ -74,13 +74,13 @@ Follow these steps to get UptimeKit running locally on your machine.
     STATUS_PAGE_PORT=3001
   ```
 
-2. **Start the docker compose**
+3. **Start the docker compose**
 
     ```bash
     docker compose up -d
     ```
 
-3. Now follow the steps on the app. Enjoy :D
+4. Now follow the steps on the app. Enjoy :D
 
 ### Manual installation
 
