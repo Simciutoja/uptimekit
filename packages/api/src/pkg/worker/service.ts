@@ -118,8 +118,6 @@ function getAutomaticIncidentDescription(input: {
 function getAutomaticIncidentOpenedMessage(input: {
     triggerStatus: AutomaticIncidentTriggerStatus;
     reason: string | null;
-    error?: string;
-    workerLabel: string;
 }) {
     const statusText = input.triggerStatus === "degraded" ? "degraded" : "down";
     const details = [
@@ -129,10 +127,6 @@ function getAutomaticIncidentOpenedMessage(input: {
     if (input.reason) {
         details.push(input.reason);
     }
-
-    details.push(
-        `Last failure: ${input.error || "unknown error"}. (Worker: ${input.workerLabel})`,
-    );
 
     return details.join(" ");
 }
@@ -753,9 +747,6 @@ async function processMonitorEventGroup(
                 message: getAutomaticIncidentOpenedMessage({
                     triggerStatus: openEvaluation.triggerStatus,
                     reason: openEvaluation.reason,
-                    error: event.error,
-                    workerLabel:
-                        workerLabels.get(eventWorkerId) || eventWorkerId,
                 }),
                 type: "event",
                 createdAt: eventTime,
