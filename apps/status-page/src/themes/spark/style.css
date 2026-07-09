@@ -1,0 +1,158 @@
+[data-theme="spark"] {
+    --background: #161618;
+    --card: #161618;
+    --foreground: #e8e8ec;
+    --muted: #232329;
+    --muted-foreground: #8f8e99;
+    --border: #33333a;
+    --status-operational: #16b89f;
+    --status-degraded: #f59e0b;
+    --status-partial-outage: #f97316;
+    --status-major-outage: #f25533;
+    --status-maintenance: #3b82f6;
+    --status-unknown: #50505a;
+    color-scheme: dark;
+}
+
+/* checkmark drawn inside the status icon */
+[data-theme="spark"] .spark-status-icon::after {
+    width: 4px;
+    height: 7px;
+    border: solid #101012;
+    border-width: 0 2px 2px 0;
+    content: "";
+    transform: translateY(-1px) rotate(45deg);
+}
+
+/* chevron border-shape + rotations (border-width trick is awkward in Tailwind) */
+[data-theme="spark"] .spark-chevron {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border: solid currentColor;
+    border-width: 0 1.5px 1.5px 0;
+    color: var(--muted-foreground);
+}
+
+[data-theme="spark"] .spark-chevron-left {
+    transform: rotate(135deg);
+}
+
+[data-theme="spark"] .spark-chevron-right {
+    transform: rotate(-45deg);
+}
+
+[data-theme="spark"] .spark-chevron-down {
+    width: 6px;
+    height: 6px;
+    transition: transform 160ms ease;
+    transform: translateY(-2px) rotate(45deg);
+}
+
+[data-theme="spark"]
+    .spark-component-toggle[data-open="true"]
+    .spark-chevron-down {
+    transform: translateY(2px) rotate(225deg);
+}
+
+/* expand/collapse via interpolatable grid-template-rows (no Tailwind equiv) */
+[data-theme="spark"] .spark-summary,
+[data-theme="spark"] .spark-component-panel {
+    display: grid;
+    overflow: hidden;
+    transition:
+        grid-template-rows 220ms ease,
+        opacity 180ms ease,
+        transform 220ms ease;
+}
+
+[data-theme="spark"] .spark-summary {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+[data-theme="spark"] .spark-group-row[data-open="true"] .spark-summary {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transform: translateY(-4px);
+}
+
+[data-theme="spark"] .spark-component-panel {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transform: translateY(-6px);
+}
+
+[data-theme="spark"] .spark-component-panel[data-open="true"] {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+[data-theme="spark"] .spark-summary-inner,
+[data-theme="spark"] .spark-component-panel-inner {
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* warning icon drawn as a CSS triangle + glyph (pseudo-elements) */
+[data-theme="spark"] .spark-tooltip-icon {
+    position: relative;
+    width: 15px;
+    height: 15px;
+    flex: 0 0 15px;
+    margin-top: 2px;
+}
+
+[data-theme="spark"] .spark-tooltip-icon::before {
+    position: absolute;
+    inset: 0;
+    background: var(--status-degraded);
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    content: "";
+}
+
+[data-theme="spark"] .spark-tooltip-icon::after {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 3px;
+    color: var(--card);
+    content: "!";
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+[data-theme="spark"] .spark-tooltip-icon[data-status="operational"]::before,
+[data-theme="spark"]
+    .spark-tooltip-icon[data-status="maintenance_completed"]::before {
+    border-radius: 999px;
+    background: var(--status-operational);
+    clip-path: none;
+}
+
+[data-theme="spark"] .spark-tooltip-icon[data-status="operational"]::after,
+[data-theme="spark"]
+    .spark-tooltip-icon[data-status="maintenance_completed"]::after {
+    padding-top: 0;
+    content: "✓";
+    font-size: 9px;
+}
+
+[data-theme="spark"] .spark-tooltip-icon[data-status="major_outage"]::before {
+    background: var(--status-major-outage);
+}
+
+[data-theme="spark"] .spark-tooltip-icon[data-status="partial_outage"]::before,
+[data-theme="spark"]
+    .spark-tooltip-icon[data-status="maintenance_scheduled"]::before {
+    background: var(--status-partial-outage);
+}
+
+[data-theme="spark"] .spark-tooltip-icon[data-status="maintenance"]::before {
+    background: var(--status-maintenance);
+}
