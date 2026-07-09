@@ -12,51 +12,6 @@ import { resolveTimeSeriesBackend, TimescaleDriver } from "./timeseries";
 
 loadEnv();
 
-const isColumnAlreadyExistsError = (error: unknown) => {
-    const errorStr =
-        error instanceof Error ? error.toString() : String(error ?? "");
-
-    return (
-        (typeof error === "object" &&
-            error !== null &&
-            ("code" in error ? error.code === "42701" : false)) ||
-        ("cause" in (error as Record<string, unknown>)
-            ? (error as { cause?: { code?: string } }).cause?.code === "42701"
-            : false) ||
-        (errorStr.includes("42701") && errorStr.includes("already exists"))
-    );
-};
-
-const isTableAlreadyExistsError = (error: unknown) => {
-    const errorStr =
-        error instanceof Error ? error.toString() : String(error ?? "");
-
-    return (
-        (typeof error === "object" &&
-            error !== null &&
-            ("code" in error ? error.code === "42P07" : false)) ||
-        ("cause" in (error as Record<string, unknown>)
-            ? (error as { cause?: { code?: string } }).cause?.code === "42P07"
-            : false) ||
-        (errorStr.includes("42P07") && errorStr.includes("already exists"))
-    );
-};
-
-const isConstraintAlreadyExistsError = (error: unknown) => {
-    const errorStr =
-        error instanceof Error ? error.toString() : String(error ?? "");
-
-    return (
-        (typeof error === "object" &&
-            error !== null &&
-            ("code" in error ? error.code === "42710" : false)) ||
-        ("cause" in (error as Record<string, unknown>)
-            ? (error as { cause?: { code?: string } }).cause?.code === "42710"
-            : false) ||
-        (errorStr.includes("42710") && errorStr.includes("already exists"))
-    );
-};
-
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const migrationsFolder = path.join(
@@ -242,23 +197,9 @@ const runPostgresMigrations = async () => {
         const end = Date.now();
         console.log(`✅ PostgreSQL migrations completed in ${end - start}ms`);
     } catch (error) {
-        if (
-            isColumnAlreadyExistsError(error) ||
-            isTableAlreadyExistsError(error) ||
-            isConstraintAlreadyExistsError(error)
-        ) {
-            console.log(
-                "⚠️ Some schema elements already exist, this may indicate schema drift",
-            );
-            console.log("   Continuing with startup...");
-            console.log(
-                `   Error details: ${error instanceof Error ? error.message : String(error)}`,
-            );
-        } else {
-            console.error("❌ PostgreSQL migration failed");
-            console.error(error);
-            process.exit(1);
-        }
+        console.error("❌ PostgreSQL migration failed");
+        console.error(error);
+        process.exit(1);
     } finally {
         await client.end();
     }

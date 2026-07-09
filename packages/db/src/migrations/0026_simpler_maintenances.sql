@@ -1,4 +1,4 @@
-ALTER TABLE "incident" ADD COLUMN "planned_end_at" timestamp;
+ALTER TABLE "incident" ADD COLUMN IF NOT EXISTS "planned_end_at" timestamp;
 --> statement-breakpoint
 INSERT INTO "incident" (
 	"id",
