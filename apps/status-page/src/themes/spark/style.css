@@ -7,7 +7,7 @@
     --border: #33333a;
     --status-operational: #16b89f;
     --status-degraded: #f59e0b;
-    --status-partial-outage: #f97316;
+    --status-partial-outage: #f59e0b;
     --status-major-outage: #f25533;
     --status-maintenance: #3b82f6;
     --status-unknown: #50505a;
