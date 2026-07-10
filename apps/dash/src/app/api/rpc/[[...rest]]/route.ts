@@ -1,7 +1,11 @@
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
-import { RPCHandler } from "@orpc/server/fetch";
+import { CompressionPlugin, RPCHandler } from "@orpc/server/fetch";
+import {
+    BatchHandlerPlugin,
+    StrictGetMethodPlugin,
+} from "@orpc/server/plugins";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { createContext } from "@uptimekit/api/context";
 import { createLogger } from "@uptimekit/api/lib/logger";
@@ -17,10 +21,16 @@ const evlogOrpcOptions = {
 };
 
 const rpcHandler = new RPCHandler(appRouter, {
+    strictGetMethodPluginEnabled: false,
     interceptors: [
         onError((error) => {
             logger.error("RPC error:", error);
         }),
+    ],
+    plugins: [
+        new StrictGetMethodPlugin(),
+        new BatchHandlerPlugin(),
+        new CompressionPlugin(),
     ],
 });
 const apiHandler = new OpenAPIHandler(appRouter, {

@@ -15,7 +15,6 @@ const nextConfig: NextConfig = {
         "@uptimekit/db",
         "@uptimekit/auth",
         "@uptimekit/config",
-        "@uptimekit/scheduler",
     ],
     images: {
         remotePatterns: [

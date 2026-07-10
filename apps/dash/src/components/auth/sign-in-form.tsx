@@ -17,7 +17,6 @@ import {
     InputGroupInput,
 } from "@/components/ui/input-group";
 import { authClient } from "@/lib/auth-client";
-import Loader from "../common/loader";
 
 type OidcLookupResponse =
     | { hasProvider: false }
@@ -69,7 +68,6 @@ export default function SignInForm({
     startInPasswordStep?: boolean;
 }) {
     const router = useRouter();
-    const { isPending } = authClient.useSession();
     const [isPasswordStep, setIsPasswordStep] = useState(startInPasswordStep);
 
     const handleSocialSignIn = async (provider: "discord" | "github") => {
@@ -178,10 +176,6 @@ export default function SignInForm({
             }),
         },
     });
-
-    if (isPending) {
-        return <Loader />;
-    }
 
     const authContent = (
         <div className="fade-in slide-in-from-bottom-4 flex w-full animate-in flex-col gap-4 duration-600">

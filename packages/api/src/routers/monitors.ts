@@ -1781,42 +1781,39 @@ export const monitorsRouter = {
             });
             if (!mon) throw new ORPCError("NOT_FOUND");
 
-            // Helper to calculate stats for a given start date
-            const calculateStats = async (startDate: Date | null) => {
-                const now = Date.now();
-                const monitorCreatedAt = mon.createdAt.getTime();
-                const periodStart = startDate
-                    ? startDate.getTime()
-                    : monitorCreatedAt;
-                const nowDate = new Date(now);
-                const periodStartDate = new Date(periodStart);
-                const totalTime = Math.max(1, now - periodStart);
-
-                const incidents = await db
-                    .select({
-                        startedAt: incident.startedAt,
-                        endedAt: incident.endedAt,
-                    })
-                    .from(incidentMonitor)
-                    .innerJoin(
-                        incident,
-                        eq(incidentMonitor.incidentId, incident.id),
-                    )
-                    .where(
-                        and(
-                            eq(incidentMonitor.monitorId, input.monitorId),
-                            eq(
-                                incident.organizationId,
-                                session.activeOrganizationId!,
-                            ),
-                            lte(incident.startedAt, nowDate),
-                            or(
-                                isNull(incident.endedAt),
-                                gte(incident.endedAt, periodStartDate),
-                            ),
+            const nowMs = Date.now();
+            const monitorCreatedAt = mon.createdAt.getTime();
+            const incidents = await db
+                .select({
+                    startedAt: incident.startedAt,
+                    endedAt: incident.endedAt,
+                })
+                .from(incidentMonitor)
+                .innerJoin(
+                    incident,
+                    eq(incidentMonitor.incidentId, incident.id),
+                )
+                .where(
+                    and(
+                        eq(incidentMonitor.monitorId, input.monitorId),
+                        eq(
+                            incident.organizationId,
+                            session.activeOrganizationId!,
                         ),
-                    )
-                    .orderBy(incident.startedAt);
+                        lte(incident.startedAt, new Date(nowMs)),
+                        or(
+                            isNull(incident.endedAt),
+                            gte(incident.endedAt, mon.createdAt),
+                        ),
+                    ),
+                )
+                .orderBy(incident.startedAt);
+
+            const calculateStats = (startDate: Date | null) => {
+                const periodStart = startDate
+                    ? Math.max(startDate.getTime(), monitorCreatedAt)
+                    : monitorCreatedAt;
+                const totalTime = Math.max(1, nowMs - periodStart);
 
                 const overlappingDurations = incidents.map((item) => {
                     const overlapStart = Math.max(
@@ -1824,8 +1821,8 @@ export const monitorsRouter = {
                         periodStart,
                     );
                     const overlapEnd = Math.min(
-                        (item.endedAt ?? new Date(now)).getTime(),
-                        now,
+                        (item.endedAt ?? new Date(nowMs)).getTime(),
+                        nowMs,
                     );
                     return Math.max(0, overlapEnd - overlapStart);
                 });
@@ -1866,11 +1863,11 @@ export const monitorsRouter = {
             year.setDate(now.getDate() - 365);
 
             return {
-                today: await calculateStats(day),
-                week: await calculateStats(week),
-                month: await calculateStats(month),
-                year: await calculateStats(year),
-                all: await calculateStats(null),
+                today: calculateStats(day),
+                week: calculateStats(week),
+                month: calculateStats(month),
+                year: calculateStats(year),
+                all: calculateStats(null),
             };
         }),
 

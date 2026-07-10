@@ -175,6 +175,7 @@ export function IncidentsTable() {
     const router = useRouter();
     const suppressRowNavigationUntilRef = useRef(0);
     const [searchOpen, setSearchOpen] = useState(false);
+    const [filtersOpen, setFiltersOpen] = useState(false);
     const [filters, setFilters] = useQueryStates({
         search: parseAsString.withDefault(""),
         status: parseAsStringEnum([...INCIDENT_STATUS_FILTERS]),
@@ -255,12 +256,14 @@ export function IncidentsTable() {
             },
         }),
     );
-    const { data: monitorsData } = useQuery(
-        orpc.monitors.list.queryOptions({ input: { limit: 100 } }),
-    );
-    const { data: statusPagesData } = useQuery(
-        orpc.statusPages.list.queryOptions({ input: { limit: 100 } }),
-    );
+    const { data: monitorsData } = useQuery({
+        ...orpc.monitors.list.queryOptions({ input: { limit: 100 } }),
+        enabled: filtersOpen || monitorFilter !== null,
+    });
+    const { data: statusPagesData } = useQuery({
+        ...orpc.statusPages.list.queryOptions({ input: { limit: 100 } }),
+        enabled: filtersOpen || statusPageFilter !== null,
+    });
 
     const incidents = data?.items;
     const monitors = monitorsData?.items ?? [];
@@ -775,7 +778,11 @@ export function IncidentsTable() {
                             <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-primary" />
                         )}
                     </Button>
-                    <DropdownMenu modal={false}>
+                    <DropdownMenu
+                        modal={false}
+                        open={filtersOpen}
+                        onOpenChange={setFiltersOpen}
+                    >
                         <DropdownMenuTrigger
                             render={
                                 <Button

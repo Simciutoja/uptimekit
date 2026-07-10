@@ -7,7 +7,7 @@ import {
     faWrench,
 } from "@fortawesome/free-solid-svg-icons";
 
-const theInsideColorOpacity = "/25";
+const theInsideColorOpacity = "/12";
 
 export const statusConfig = {
     operational: {

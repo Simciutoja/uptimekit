@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { sileo } from "sileo";
 import z from "zod";
 import { AuthDivider } from "@/components/auth/auth-divider";
-import Loader from "@/components/common/loader";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,7 +35,6 @@ export default function SignUpForm({
     fullPage?: boolean;
 }) {
     const router = useRouter();
-    const { isPending } = authClient.useSession();
 
     const handleSocialSignIn = async (provider: "discord" | "github") => {
         await authClient.signIn.social({
@@ -86,10 +84,6 @@ export default function SignUpForm({
             }),
         },
     });
-
-    if (isPending) {
-        return <Loader />;
-    }
 
     const authContent = (
         <div className="fade-in slide-in-from-bottom-4 flex w-full animate-in flex-col gap-4 duration-600">

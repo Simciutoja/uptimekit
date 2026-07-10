@@ -1,5 +1,6 @@
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
+import { BatchLinkPlugin, DedupeRequestsPlugin } from "@orpc/client/plugins";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 import type { AppRouterClient } from "@uptimekit/api/routers/index";
@@ -38,6 +39,25 @@ export const link = new RPCLink({
         const { headers } = await import("next/headers");
         return Object.fromEntries(await headers());
     },
+    plugins: [
+        new DedupeRequestsPlugin({
+            filter: ({ request }) => request.method === "GET", // Filters requests to dedupe
+            groups: [
+                {
+                    condition: () => true,
+                    context: {}, // Context used for the rest of the request lifecycle
+                },
+            ],
+        }),
+        new BatchLinkPlugin({
+            groups: [
+                {
+                    condition: (options) => true,
+                    context: {}, // Context used for the rest of the request lifecycle
+                },
+            ],
+        }),
+    ],
 });
 
 export const client: AppRouterClient = createORPCClient(link);
