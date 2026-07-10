@@ -1,0 +1,234 @@
+---
+title: 'Incident Management'
+description: 'Create, update, and manage incidents to communicate service status with your users'
+icon: 'triangle-exclamation'
+---
+
+UptimeKit provides a comprehensive incident management system to help you communicate service disruptions, maintenance windows, and resolutions to your users effectively.
+
+## Overview
+
+Incidents are events that affect service availability or performance. UptimeKit allows you to:
+
+- Create incidents manually through the dashboard
+- Update incidents with status changes and comments
+- Resolve incidents when services are restored
+- Automatically create incidents via integrations
+
+Incidents are displayed on your status pages, keeping users informed about ongoing issues and their resolution progress.
+
+## Incident Lifecycle
+
+Incidents in UptimeKit follow a structured lifecycle with distinct states:
+
+| State | Description | Typical Use |
+|-------|-------------|-------------|
+| **Investigating** | Initial state when an issue is first identified | Service is down and the team is determining the root cause |
+| **Acknowledged** | Issue has been confirmed and is being worked on | Problem identified, team actively working on a solution |
+| **Monitoring** | Fix has been applied and is being monitored | Solution deployed, watching for stability before full resolution |
+| **Resolved** | Issue has been completely resolved | Service fully restored and stable |
+
+### State Transitions
+
+A typical incident flow might look like:
+
+1. **Investigating** → Team becomes aware of an issue
+2. **Acknowledged** → Root cause identified, fix in progress
+3. **Monitoring** → Fix deployed, monitoring for stability
+4. **Resolved** → Service confirmed stable, incident closed
+
+<Info>
+  You can move between states as needed. For example, if an issue recurs during the Monitoring phase, you can move back to Acknowledged or Investigating.
+</Info>
+
+## Creating Incidents Manually
+
+<Steps>
+  <Step title="Navigate to Incidents">
+    Go to the **Incidents** section in your dashboard.
+  </Step>
+
+  <Step title="Create New Incident">
+    Click **Create Incident** and provide:
+    - **Title**: A clear, concise description of the issue
+    - **Description**: Detailed information about the problem and its impact
+    - **Status**: Initial state (typically "Investigating")
+    - **Affected Monitors**: Select which monitors are impacted
+    - **Severity**: Critical, Major, or Minor
+  </Step>
+
+  <Step title="Publish">
+    Click **Create** to publish the incident to your status page.
+  </Step>
+</Steps>
+
+### Severity Levels
+
+Choose the appropriate severity level for each incident:
+
+- **Critical**: Complete service outage, all users affected
+- **Major**: Significant degradation, most users affected
+- **Minor**: Partial degradation, limited user impact
+
+## Updating Incidents
+
+As you work to resolve an issue, keep users informed by updating the incident.
+
+### Adding Updates
+
+<Steps>
+  <Step title="Open Incident">
+    Navigate to the incident you want to update.
+  </Step>
+
+  <Step title="Add Comment">
+    In the **Updates** section, add a new comment describing:
+    - Current progress
+    - Actions being taken
+    - Expected timeline (if known)
+    - Any workarounds available
+  </Step>
+
+  <Step title="Update Status">
+    If the incident state has changed, update the status to reflect the current situation (e.g., from "Investigating" to "Acknowledged").
+  </Step>
+
+  <Step title="Publish Update">
+    Click **Add Update** to publish the information to your status page.
+  </Step>
+</Steps>
+
+### Best Practices for Updates
+
+- Provide regular updates even if there's no significant progress
+- Be transparent about the situation and timeline
+- Include specific details about actions being taken
+- Update the status as soon as the situation changes
+- Communicate clearly and avoid technical jargon when possible
+
+<Info>
+  Frequent communication during incidents builds trust with your users, even when you don't have a solution yet.
+</Info>
+
+## Resolving Incidents
+
+When the issue is fully resolved and service is stable:
+
+<Steps>
+  <Step title="Add Final Update">
+    Provide a final update explaining:
+    - What was resolved
+    - How it was fixed
+    - Any preventive measures taken
+    - Expected stability going forward
+  </Step>
+
+  <Step title="Change Status to Resolved">
+    Update the incident status to "Resolved".
+  </Step>
+
+  <Step title="Monitor Post-Resolution">
+    Keep an eye on the affected services for a period after resolution to ensure stability.
+  </Step>
+</Steps>
+
+### Resolution Best Practices
+
+- Summarize the incident and its impact
+- Explain the root cause (if appropriate)
+- Describe the fix that was applied
+- Mention any steps taken to prevent recurrence
+- Thank users for their patience
+
+## Automatic Incident Creation
+
+UptimeKit can automatically create incidents based on alerts from integrated systems. This is particularly useful for automating your incident response workflow.
+
+### Supported Integrations
+
+The following integrations support automatic incident creation:
+
+- **Prometheus AlertManager**: Creates incidents when alerts fire, automatically resolves when alerts clear
+- **Custom Webhooks**: Send POST requests to create incidents programmatically
+- **Future Integrations**: Additional integrations may support this feature
+
+### How It Works
+
+1. An external system (e.g., Prometheus) detects an issue
+2. The system sends an alert to UptimeKit via the configured integration
+3. UptimeKit automatically creates a new incident with relevant details
+4. The incident appears on your status page immediately
+5. When the alert clears, UptimeKit can automatically resolve the incident (if configured)
+
+<Info>
+  Automatic incident creation requires configuring integrations in **Settings** > **Integrations**. See the [Integrations](/integrations) section for setup guides.
+</Info>
+
+### Benefits of Automation
+
+- **Faster Response**: Incidents are created immediately when issues occur
+- **Reduced Manual Work**: No need to manually create incidents for every alert
+- **Consistency**: Automated incidents follow a standardized format
+- **24/7 Coverage**: Incidents are created even outside business hours
+- **Better User Experience**: Users are notified promptly about issues
+
+## Integration Examples
+
+### Prometheus AlertManager
+
+Configure Prometheus to automatically create incidents when alerts fire. The integration supports:
+
+- Alert deduplication via fingerprints
+- Severity mapping from alert labels
+- Automatic resolution when alerts clear
+- Customizable incident titles using templates
+
+See the [Prometheus AlertManager integration guide](/integrations/prometheus) for detailed setup instructions.
+
+### Custom Webhooks
+
+Send HTTP POST requests to the webhook integration endpoint to create incidents programmatically. This is useful for:
+
+- Custom monitoring systems
+- Third-party services
+- Scheduled maintenance notifications
+- Manual API integrations
+
+See the [Webhook integration guide](/integrations/webhook) for payload format and examples.
+
+## Incident Visibility
+
+Incidents are automatically displayed on your status pages according to their state:
+
+- **Active Incidents** (Investigating, Acknowledged, Monitoring): Shown prominently at the top of the status page
+- **Resolved Incidents**: Moved to the incident history section
+- **Affected Monitors**: Clearly indicated on the status page
+
+Users can view the full incident timeline, including all updates and status changes, by clicking on an incident.
+
+## Best Practices
+
+### Communication
+
+- **Be Proactive**: Create incidents as soon as you're aware of an issue
+- **Update Regularly**: Provide updates every 15-30 minutes during active incidents
+- **Be Transparent**: Explain what happened and what you're doing about it
+- **Close the Loop**: Always add a final update when resolving
+
+### Organization
+
+- **Use Clear Titles**: Make it immediately obvious what the issue is
+- **Tag Affected Monitors**: Help users understand which services are impacted
+- **Choose Appropriate Severity**: Accurately reflect the incident's impact
+- **Keep History**: Resolved incidents serve as a historical record
+
+### Automation
+
+- **Configure Integrations**: Set up automatic incident creation for faster response
+- **Test Your Workflow**: Verify that automated incidents are created correctly
+- **Monitor Notifications**: Ensure your team is alerted when incidents are created
+- **Review Regularly**: Periodically review incident patterns to identify systemic issues
+
+<Warning>
+  Always verify that resolved incidents reflect actual service restoration. Prematurely resolving incidents can erode user trust.
+</Warning>

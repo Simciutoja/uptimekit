@@ -1,0 +1,156 @@
+---
+title: "Status Pages"
+description: "Configure custom domains, slug routing, and password protection for your status pages"
+icon: "globe"
+---
+
+## Custom Domain Configuration
+
+You can host your status pages on a custom domain by configuring the `APP_STATUS_PAGE_DOMAIN` environment variable.
+
+### Setup Steps
+
+<Info>
+    You can only have slugs on this domain. If you want a status page without a
+    slug you need to use a different domain
+</Info>
+
+<Steps>
+  <Step title="Configure Environment Variable">
+    Add the following to your `.env` file:
+
+    ```ini
+    APP_STATUS_PAGE_DOMAIN=status.example.com
+    ```
+
+    Replace `status.example.com` with your desired status pages domain.
+
+  </Step>
+  <Step title="Configure DNS">
+    Point your custom domain to your UptimeKit installation:
+
+    - Add an A record pointing to your status-page server's IP address
+
+  </Step>
+  <Step title="Restart Application">
+    Restart your UptimeKit instance to apply the changes:
+
+    ```bash
+    docker compose down
+    docker compose up -d
+    ```
+
+  </Step>
+</Steps>
+
+<Info>
+    If you don't configure a custom domain, status pages will be accessible via
+    the default the domain reverse proxying the status page.
+</Info>
+
+## Slug-Based Routing
+
+Each status page can have a unique slug that makes it accessible via a clean URL path.
+
+### How It Works
+
+When you create or edit a status page, you can set a custom slug in the status page settings. The slug will be used in the URL:
+
+```text
+https://status.example.com/your-slug
+```
+
+### Best Practices
+
+- Use lowercase letters, numbers, and hyphens
+- Keep slugs short and memorable
+- Use descriptive names (e.g., `api`, `website`, `services`)
+- Avoid special characters or spaces
+
+<Info>
+    Slugs must be unique across all status pages in your UptimeKit instance.
+</Info>
+
+## Password Protection
+
+You can make status pages private by enabling password protection. This is useful for internal status pages or pages with sensitive information.
+
+### Enabling Password Protection
+
+<Steps>
+  <Step title="Configure Secret Key (Optional)">
+    Optionally add a dedicated secret for status page access tokens to your `.env` file:
+
+    ```ini
+    STATUS_PAGE_ACCESS_SECRET=your_secure_secret_here
+    ```
+
+    <Info>
+      This environment variable is **optional**. If not set, UptimeKit will use `BETTER_AUTH_SECRET` as a fallback. The secret is used to sign session tokens, not for the actual status page passwords (those are set per-page in the dashboard).
+    </Info>
+
+    <Info>
+      To generate a secure secret:
+
+      ```bash
+      openssl rand -base64 32
+      ```
+    </Info>
+
+  </Step>
+  <Step title="Enable Protection in Dashboard">
+    1. Navigate to your status page settings
+    2. Toggle the "Make private" option
+    3. Set a password for the status page
+    4. Save your changes
+  </Step>
+  <Step title="Access Protected Page">
+    When users visit your status page, they'll be prompted to enter the password. After successful authentication, they'll have access for 24 hours via a secure session token.
+  </Step>
+</Steps>
+
+### Security Features
+
+Password-protected status pages include several security features:
+
+| Feature          | Description                                                                                                        |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Argon2id Hashing | Passwords are hashed using Argon2id, a modern password hashing algorithm resistant to GPU and side-channel attacks |
+| Session Tokens   | Users receive a 24-hour session token after successful authentication                                              |
+| Rate Limiting    | Built-in protection against brute-force attacks                                                                    |
+| Secure Storage   | Passwords are never stored in plain text                                                                           |
+
+<Warning>
+    Always use strong, unique passwords for protected status pages. Either
+    `STATUS_PAGE_ACCESS_SECRET` or `BETTER_AUTH_SECRET` must be configured for
+    password protection to work.
+</Warning>
+
+### User Authentication Flow
+
+1. User visits the protected status page URL
+2. UptimeKit displays a password prompt
+3. User enters the status page password
+4. Password is verified against the Argon2id hash
+5. Upon success, a secure session token is issued for 24 hours
+6. User can access the status page without re-authentication during the session period
+
+## Example Configuration
+
+Here's a complete example of status page configuration in your `.env` file:
+
+```ini
+# Status Page Configuration
+NEXT_PUBLIC_STATUS_PAGE_DOMAIN=status.uptimekit.dev
+STATUS_PAGE_ACCESS_SECRET=dGhpcyBpcyBhIHZlcnkgc2VjdXJlIHNlY3JldCBrZXk=  # Optional, falls back to BETTER_AUTH_SECRET
+
+# Dashboard Configuration
+BETTER_AUTH_SECRET=change_me_to_a_secure_secret  # Also used as fallback for STATUS_PAGE_ACCESS_SECRET
+BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_URL=http://localhost:3000
+```
+
+<Info>
+    Remember to restart your UptimeKit instance after making changes to
+    environment variables.
+</Info>

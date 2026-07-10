@@ -1,0 +1,76 @@
+---
+title: "Time-series Storage"
+description: "Configure TimescaleDB or ClickHouse for monitor events and uptime history"
+icon: "database"
+---
+
+UptimeKit stores monitor events, status changes, and latency history in a time-series backend. You can use TimescaleDB with PostgreSQL or ClickHouse as a separate database.
+
+## Overview
+
+UptimeKit supports two time-series backends:
+
+- **TimescaleDB**: Store time-series data in PostgreSQL with the TimescaleDB extension
+- **ClickHouse**: Store time-series data in a dedicated ClickHouse database
+
+Choose the backend with the `TIMESERIES_BACKEND` environment variable.
+
+## TimescaleDB (Recommended)
+
+TimescaleDB can use your main application database or a separate database since its just a PostgreSQL extension.
+
+### Main Database
+
+If your main PostgreSQL database has the TimescaleDB extension available, UptimeKit can reuse `DATABASE_URL`.
+
+```bash
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/uptimekit
+TIMESERIES_BACKEND=timescale
+```
+
+### Separate Database
+
+If you want time-series data in a different TimescaleDB database, set `TIMESCALE_DATABASE_URL`.
+
+```bash
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/uptimekit
+TIMESERIES_BACKEND=timescale
+TIMESCALE_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/uptimekit_timeseries
+```
+
+<Info>
+    If `TIMESCALE_DATABASE_URL` is not set, UptimeKit uses `DATABASE_URL` for
+    TimescaleDB.
+</Info>
+
+<Warning>
+    The PostgreSQL database used for time-series data must have the TimescaleDB
+    extension installed.
+</Warning>
+
+## ClickHouse
+
+ClickHouse can also be used as the time-series backend by setting the ClickHouse environment variables.
+
+```bash
+TIMESERIES_BACKEND=clickhouse
+CLICKHOUSE_URL=http://localhost:8123
+CLICKHOUSE_USER=default
+CLICKHOUSE_PASSWORD=
+```
+
+<Info>
+    Set these variables for each UptimeKit app that reads or writes monitor
+    history.
+</Info>
+
+## Environment Variables
+
+| Variable                 | Required       | Description                                             |
+| ------------------------ | -------------- | ------------------------------------------------------- |
+| `TIMESERIES_BACKEND`     | No             | Use `timescale` or `clickhouse` defaults to `timescale` |
+| `DATABASE_URL`           | Yes            | Main PostgreSQL database URL                            |
+| `TIMESCALE_DATABASE_URL` | No             | Optional TimescaleDB URL for time-series data           |
+| `CLICKHOUSE_URL`         | For ClickHouse | ClickHouse HTTP endpoint                                |
+| `CLICKHOUSE_USER`        | For ClickHouse | ClickHouse username                                     |
+| `CLICKHOUSE_PASSWORD`    | For ClickHouse | ClickHouse password                                     |

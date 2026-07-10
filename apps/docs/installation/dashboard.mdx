@@ -1,0 +1,81 @@
+---
+title: "Dashboard Installation"
+description: "How to install and deploy the UptimeKit dashboard using Docker Compose"
+icon: "download"
+---
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed on your server or local machine:
+
+- [Docker Engine](https://docs.docker.com/engine/install)
+
+## Installation Steps
+
+<Steps>
+  <Step title="Clone the Repository">
+    Start by downloading [docker-compose.yml](https://github.com/uptimekit/uptimekit) and [.env.example](https://github.com/uptimekit/uptimekit)
+  </Step>
+  <Step title="Configure Environment Variables">
+    Create a copy of the example environment file:
+
+    ```bash
+    curl -L https://raw.githubusercontent.com/uptimekit/uptimekit/refs/heads/main/docker-compose.production.yml -o docker-compose.production.yml
+    ```
+
+    Open the `.env` file and configure the following variables. Make sure to replace the placeholder values with your actual configuration.
+
+    ```ini
+    APP_SECRET=change_me_to_a_secure_secret
+    APP_URL=http://localhost:3000
+
+    # Status Pages Configuration (Optional)
+    APP_STATUS_PAGE_DOMAIN=status.example.com
+    ```
+
+    <Info>
+      To generate secure secrets, you can use the following command:
+
+      ```bash
+      openssl rand -base64 32
+      ```
+
+      `APP_SECRET` is required. `STATUS_PAGE_ACCESS_SECRET` is optional and will use `APP_SECRET` as a fallback if not set.
+    </Info>
+
+    <Info>
+      For more details on configuring custom domains and password-protected status pages, see the [Status Pages Configuration](/configuration/status_pages) guide.
+    </Info>
+
+  </Step>
+  <Step title="Start with Docker Compose">
+    Run the following command to build and start the application in detached mode:
+
+    ```bash
+    docker compose up -d
+    ```
+
+  </Step>
+  <Step title="Verify Installation">
+    Once the containers are running, you can access the dashboard at:
+
+    `http://localhost:3000` (or `http://<YOUR_SERVER_IP>:3000`)
+
+    To check the logs and ensure everything is running smoothly:
+
+    ```bash
+    docker compose logs -f
+    ```
+
+  </Step>
+</Steps>
+
+## Updating the Dashboard
+
+To update to the latest version, pull the latest changes from git and restart the containers:
+
+```bash
+docker compose pull
+docker compose down
+docker compose up -d --force-recreate
+```

@@ -1,0 +1,55 @@
+---
+title: "Worker Configuration"
+description: "Generate credentials to connect your worker to the dashboard"
+icon: "server"
+---
+
+To connect a worker instance to your UptimeKit dashboard, you need to first create a worker identity in the admin panel and generate an API key. This key secures the communication between your worker and the dashboard.
+
+<Steps>
+  <Step title="Navigate to Workers Page">
+    Navigate to the **Workers** page in the Admin Dashboard and click the **Add Worker** button located at the top right of the table.
+
+    <Frame>
+      <img height="200" src="/images/workers/index.png" />
+    </Frame>
+
+  </Step>
+
+  <Step title="Create New Worker">
+    In the dialog that appears, fill in the details for your new worker:
+
+    - **Name**: A descriptive name for your worker (e.g., "US East Node").
+    - **Location**: Select the Country where your worker is hosted (e.g., "Romania", "Belgium"). This helps in identifying the source of monitoring requests and providing accurate latency data.
+
+    <Frame>
+      <img height="200" src="/images/workers/dialog.png" />
+    </Frame>
+
+    Click the **Create Worker** button to confirm.
+
+  </Step>
+
+  <Step title="Save API Key">
+    Once the worker is successfully created, a confirmation dialog will appear displaying your new API Key.
+
+    <Warning>
+      **Important:** This API key is only shown once. Make sure to copy it immediately and store it securely. If you lose it, you will need to regenerate a new key, which requires updating your worker's configuration.
+    </Warning>
+
+    <Frame>
+      <img height="200" src="/images/workers/key.png" />
+    </Frame>
+
+    1. Click the **Copy** icon next to the API key field to copy it to your clipboard.
+    2. Store this key safely. You will need to set it as the `WORKER_API_KEY` environment variable when running your worker instance.
+    3. Click **Done** to close the dialog.
+
+  </Step>
+</Steps>
+
+## Next Steps
+
+With the API Key generated, you are ready to launch your worker.
+
+- [Install the Worker](/installation/worker): Learn how to run the worker using Docker.

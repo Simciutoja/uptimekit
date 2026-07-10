@@ -1,0 +1,112 @@
+{
+    "$schema": "https://mintlify.com/docs.json",
+    "theme": "aspen",
+    "name": "UptimeKit",
+    "colors": {
+        "primary": "#0f0f0f",
+        "light": "#f0f0f0",
+        "dark": "#0f0f0f"
+    },
+    "favicon": "logo/dark.svg",
+    "navigation": {
+        "tabs": [
+            {
+                "tab": "Guides",
+                "groups": [
+                    {
+                        "group": "Getting started",
+                        "pages": ["index", "changelog"]
+                    },
+                    {
+                        "group": "Installation",
+                        "pages": [
+                            "installation/dashboard",
+                            "installation/worker"
+                        ]
+                    },
+                    {
+                        "group": "Configuration",
+                        "pages": [
+                            "configuration/social_login",
+                            "configuration/worker",
+                            "configuration/status_pages"
+                        ]
+                    },
+                    {
+                        "group": "Features",
+                        "pages": [
+                            "features/timeseries",
+                            "features/monitor-types",
+                            "features/monitors",
+                            "features/incidents"
+                        ]
+                    },
+                    {
+                        "group": "Integrations",
+                        "pages": [
+                            "integrations/index",
+                            "integrations/discord",
+                            "integrations/telegram",
+                            "integrations/webhook",
+                            "integrations/prometheus"
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": "Contributing",
+                "groups": [
+                    {
+                        "group": "Development",
+                        "pages": [
+                            "contributing/index",
+                            "contributing/theme-development"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "global": {
+            "anchors": []
+        }
+    },
+    "logo": {
+        "light": "/logo/light.svg",
+        "dark": "/logo/dark.svg"
+    },
+    "navbar": {
+        "links": [
+            {
+                "label": "Support",
+                "href": "mailto:contact@uptimekit.dev"
+            }
+        ]
+    },
+    "contextual": {
+        "options": [
+            "copy",
+            "view",
+            "chatgpt",
+            "claude",
+            "perplexity",
+            "mcp",
+            "cursor",
+            "vscode"
+        ]
+    },
+    "footer": {
+        "socials": {
+            "github": "https://github.com/uptimekit"
+        }
+    },
+    "integrations": {
+        "posthog": {
+            "apiKey": "phc_5Sv1zHGfyKVQKfyw4UDa4t5LTfY1pvQBN1Wvke3XUyp",
+            "apiHost": "https://eu.posthog.com",
+            "sessionRecording": false
+        }
+    },
+    "fonts": {
+        "family": "Open Sans"
+    }
+}

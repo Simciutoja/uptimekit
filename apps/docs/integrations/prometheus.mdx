@@ -1,0 +1,323 @@
+---
+title: 'Prometheus AlertManager'
+description: 'Automatically create and resolve incidents from Prometheus alerts'
+icon: 'chart-line'
+---
+
+The Prometheus AlertManager integration enables UptimeKit to automatically create and resolve incidents based on alerts from your Prometheus monitoring system. This provides seamless integration between your infrastructure monitoring and user-facing status updates.
+
+## Overview
+
+With the Prometheus AlertManager integration, you can:
+
+- Automatically create incidents when Prometheus alerts fire
+- Auto-resolve incidents when alerts clear
+- Map alert severity levels to incident severity
+- Deduplicate alerts using fingerprints
+- Customize incident titles with alert labels
+
+This integration is ideal for teams already using Prometheus for infrastructure monitoring who want to automatically reflect alerts on their status pages.
+
+## Configuration Options
+
+When setting up the Prometheus integration in your dashboard, you can configure the following options:
+
+| Field | Description | Required |
+|-------|-------------|----------|
+| **Name** | A descriptive name for this integration (e.g., "Production Prometheus") | Yes |
+| **Bearer Token** | Secure token for authenticating webhook requests | Yes |
+| **Auto-resolve** | Automatically resolve incidents when alerts clear | No (default: false) |
+| **Severity Mapping** | Map alert severity labels to incident severity levels | No |
+| **Title Template** | Customize incident titles using alert label interpolation | No |
+
+<Info>
+  The bearer token is automatically generated when you create the integration. Store it securely as it cannot be retrieved later.
+</Info>
+
+## Setup Instructions
+
+<Steps>
+  <Step title="Create Integration in UptimeKit">
+    1. Navigate to **Settings** > **Integrations** in your dashboard
+    2. Click **Add Integration** and select **Prometheus AlertManager**
+    3. Configure the integration settings:
+       - Enter a name for the integration
+       - Enable **Auto-resolve** if you want incidents to automatically resolve when alerts clear
+       - Configure severity mapping if needed
+       - Customize the title template (optional)
+    4. Click **Create**
+    5. Copy the generated **Webhook URL** and **Bearer Token**
+  </Step>
+
+  <Step title="Configure AlertManager">
+    Add the UptimeKit webhook receiver to your AlertManager configuration:
+
+    ```yaml
+    route:
+      receiver: 'default'
+      routes:
+        - match:
+            alertname: 'YourAlert'
+          receiver: 'uptimekit'
+
+    receivers:
+      - name: 'uptimekit'
+        webhook_configs:
+          - url: 'https://your-uptimekit-domain.com/api/integrations/prometheus/webhook'
+            send_resolved: true
+            http_config:
+              authorization:
+                type: Bearer
+                credentials: 'your_bearer_token_here'
+    ```
+
+    Replace:
+    - `https://your-uptimekit-domain.com/api/integrations/prometheus/webhook` with your actual webhook URL
+    - `your_bearer_token_here` with the bearer token from UptimeKit
+  </Step>
+
+  <Step title="Reload AlertManager">
+    Reload your AlertManager configuration to apply the changes:
+
+    ```bash
+    # If using systemd
+    systemctl reload alertmanager
+
+    # If using Docker
+    docker kill -s HUP alertmanager
+
+    # Or send a HUP signal to the process
+    kill -HUP $(pidof alertmanager)
+    ```
+  </Step>
+
+  <Step title="Test the Integration">
+    Trigger a test alert in Prometheus to verify that incidents are created correctly in UptimeKit. You should see a new incident appear on your status page when the alert fires.
+  </Step>
+</Steps>
+
+## Webhook Payload Format
+
+AlertManager sends webhook payloads to UptimeKit in the following format:
+
+```json
+{
+  "version": "4",
+  "groupKey": "{}:{alertname=\"HighErrorRate\"}",
+  "status": "firing",
+  "receiver": "uptimekit",
+  "groupLabels": {
+    "alertname": "HighErrorRate"
+  },
+  "commonLabels": {
+    "alertname": "HighErrorRate",
+    "severity": "critical",
+    "service": "api",
+    "instance": "api-server-1"
+  },
+  "commonAnnotations": {
+    "summary": "High error rate detected on API server",
+    "description": "Error rate is above 5% for the last 5 minutes"
+  },
+  "externalURL": "http://alertmanager:9093",
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "HighErrorRate",
+        "severity": "critical",
+        "service": "api",
+        "instance": "api-server-1"
+      },
+      "annotations": {
+        "summary": "High error rate detected on API server",
+        "description": "Error rate is above 5% for the last 5 minutes"
+      },
+      "startsAt": "2026-01-17T10:00:00.000Z",
+      "endsAt": "0001-01-01T00:00:00Z",
+      "generatorURL": "http://prometheus:9090/graph?g0.expr=...",
+      "fingerprint": "abc123def456"
+    }
+  ]
+}
+```
+
+<Info>
+  UptimeKit uses the alert fingerprint to deduplicate alerts. Multiple alerts with the same fingerprint will update the same incident rather than creating duplicates.
+</Info>
+
+## Key Features
+
+### Alert Deduplication
+
+UptimeKit uses the alert **fingerprint** provided by Prometheus to prevent duplicate incidents. When a new alert arrives:
+
+1. UptimeKit checks if an incident with the same fingerprint already exists
+2. If yes, the existing incident is updated instead of creating a new one
+3. If no, a new incident is created
+
+This ensures that alert flapping or repeated notifications don't create multiple incidents for the same issue.
+
+### Severity Mapping
+
+You can map Prometheus alert severity labels to UptimeKit incident severity levels:
+
+| Prometheus Severity | UptimeKit Severity | Default Mapping |
+|---------------------|-------------------|-----------------|
+| `critical` | Critical | Yes |
+| `warning` | Major | Yes |
+| `info` | Minor | Yes |
+| Custom labels | Configurable | Via dashboard |
+
+Configure custom severity mappings in the integration settings to match your alerting conventions.
+
+### Auto-Resolution
+
+When **Auto-resolve** is enabled:
+
+1. UptimeKit tracks the status of each alert
+2. When an alert transitions to `resolved` status in AlertManager
+3. UptimeKit automatically updates the corresponding incident to "Resolved" state
+4. A resolution message is added to the incident timeline
+
+This eliminates the need to manually resolve incidents when alerts clear, ensuring your status page accurately reflects current service status.
+
+<Warning>
+  Auto-resolve requires that your AlertManager sends both firing and resolved notifications to UptimeKit. Ensure your AlertManager route configuration doesn't filter out resolved alerts.
+</Warning>
+
+### Title Templates
+
+Customize incident titles using alert label interpolation. Use placeholders like `{{alertname}}`, `{{service}}`, or `{{instance}}` to dynamically generate titles.
+
+**Examples:**
+
+- `{{alertname}} - {{service}}` → "HighErrorRate - api"
+- `Alert: {{alertname}} on {{instance}}` → "Alert: HighErrorRate on api-server-1"
+- `{{severity | upper}}: {{summary}}` → "CRITICAL: High error rate detected"
+
+If no template is provided, UptimeKit uses the alert's `summary` annotation or `alertname` label as the incident title.
+
+## Security
+
+The Prometheus integration uses bearer token authentication to secure webhook endpoints.
+
+### Best Practices
+
+- **Protect Your Token**: Store the bearer token securely and never commit it to version control
+- **Use HTTPS**: Always use HTTPS for webhook URLs in production to encrypt the bearer token in transit
+- **Rotate Tokens**: Periodically regenerate bearer tokens by recreating the integration
+- **Limit Access**: Only configure the webhook URL in trusted AlertManager instances
+
+<Warning>
+  The bearer token acts as a password for creating incidents. Treat it with the same level of security as other sensitive credentials.
+</Warning>
+
+## Troubleshooting
+
+### Incidents Not Being Created
+
+1. **Verify bearer token**: Ensure the token in AlertManager matches the one in UptimeKit
+2. **Check webhook URL**: Confirm the URL is correct and accessible from your AlertManager instance
+3. **Review AlertManager logs**: Look for webhook delivery errors or authentication failures
+4. **Test connectivity**: Use `curl` to manually send a test payload to the webhook URL
+5. **Check integration status**: Verify the integration is enabled in UptimeKit settings
+
+### Duplicate Incidents
+
+If you're seeing duplicate incidents for the same alert:
+
+1. **Check fingerprint**: Ensure Prometheus is generating consistent fingerprints
+2. **Review alert labels**: Alerts with different labels will have different fingerprints
+3. **Verify deduplication**: Confirm that UptimeKit is receiving the fingerprint field in the payload
+
+### Auto-Resolve Not Working
+
+If incidents aren't auto-resolving when alerts clear:
+
+1. **Enable auto-resolve**: Verify the setting is enabled in the integration configuration
+2. **Check AlertManager**: Ensure resolved notifications are being sent
+3. **Review route configuration**: Confirm your AlertManager routes don't filter out resolved alerts
+4. **Verify webhook delivery**: Check AlertManager logs for successful delivery of resolved notifications
+
+## Example AlertManager Configuration
+
+Here's a complete example of an AlertManager configuration with UptimeKit integration:
+
+```yaml
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  receiver: 'default'
+  routes:
+    # Route critical alerts to UptimeKit
+    - match:
+        severity: critical
+      receiver: 'uptimekit-critical'
+      continue: true
+
+    # Route all alerts to UptimeKit
+    - match_re:
+        severity: '.*'
+      receiver: 'uptimekit-all'
+
+receivers:
+  - name: 'default'
+    # Your default receiver configuration
+
+  - name: 'uptimekit-critical'
+    webhook_configs:
+      - url: 'https://status.example.com/api/integrations/prometheus/webhook'
+        send_resolved: true
+        http_config:
+          authorization:
+            type: Bearer
+            credentials: 'your_bearer_token_here'
+
+  - name: 'uptimekit-all'
+    webhook_configs:
+      - url: 'https://status.example.com/api/integrations/prometheus/webhook'
+        send_resolved: true
+        http_config:
+          authorization:
+            type: Bearer
+            credentials: 'your_bearer_token_here'
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'cluster', 'service']
+```
+
+<Info>
+  The `send_resolved: true` setting is required for auto-resolution to work. This ensures AlertManager sends notifications when alerts clear.
+</Info>
+
+## Advanced Usage
+
+### Multiple Prometheus Instances
+
+You can create multiple Prometheus integrations in UptimeKit to handle alerts from different Prometheus instances or clusters. Each integration gets its own webhook URL and bearer token.
+
+This is useful for:
+
+- Separating production and staging alerts
+- Handling alerts from different data centers or regions
+- Routing different severity levels to different status pages
+
+### Custom Alert Processing
+
+Use severity mapping and title templates to customize how Prometheus alerts appear as incidents:
+
+1. Map your organization's severity labels to appropriate incident levels
+2. Create title templates that include relevant context from alert labels
+3. Use AlertManager's grouping features to aggregate related alerts
+
+This gives you fine-grained control over how monitoring alerts are presented to your users on status pages.

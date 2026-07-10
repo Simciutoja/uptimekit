@@ -1,0 +1,556 @@
+---
+title: 'Theme Development Guide'
+description: 'Complete guide to creating custom themes for UptimeKit status pages'
+icon: 'palette'
+---
+
+Learn how to create beautiful custom themes for UptimeKit status pages. Themes are self-contained plugins that control the appearance and layout of your status pages.
+
+## Understanding the Theme System
+
+UptimeKit's theme system is designed to be simple yet powerful. Themes are **pure rendering components** that receive data and render the UI. All theming concerns (dark mode, CSS loading, data attributes) are handled automatically.
+
+### Key Benefits
+
+- **Zero boilerplate**: Theme files are pure rendering components
+- **No flash**: Theme is set before first paint
+- **Simple architecture**: Just 2 wrapper files handle all theme logic
+- **Auto CSS loading**: Custom CSS loaded automatically from manifest
+- **Type safe**: Proper TypeScript generics throughout
+
+## Theme Structure
+
+```
+app/themes/
+├── types.ts                    # Shared types and interfaces
+├── theme-page-wrapper.tsx      # Global theme wrapper (server component)
+├── theme-provider.tsx          # Theme state sync (client component)
+├── index.ts                    # Theme registry
+└── [theme-name]/
+    ├── manifest.ts             # Theme metadata and configuration
+    ├── page.tsx                # Main status page
+    ├── incident-detail.tsx     # Incident detail page
+    ├── maintenance-detail.tsx  # Maintenance detail page
+    ├── updates.tsx             # Updates/history page
+    └── components/             # Theme-specific components
+        └── ...
+```
+
+## Creating Your First Theme
+
+### Step 1: Create Theme Directory
+
+Create a new directory under `app/themes/` with your theme name:
+
+```bash
+mkdir app/themes/my-theme
+mkdir app/themes/my-theme/components
+```
+
+### Step 2: Create Manifest
+
+Create `manifest.ts` with your theme metadata:
+
+```typescript app/themes/my-theme/manifest.ts
+import type { ThemeManifest } from "../types";
+
+export const manifest: ThemeManifest = {
+  id: "my-theme",
+  name: "My Theme",
+  description: "A beautiful custom theme",
+  version: "1.0.0",
+  supportsDarkMode: true,
+  cssFile: "/themes/my-theme/style.css", // Optional
+};
+```
+
+### Step 3: Create Main Page Component
+
+Create `page.tsx` for the main status page:
+
+```typescript app/themes/my-theme/page.tsx
+import type { ThemePageProps } from "../types";
+
+export default function MyTheme({ data }: ThemePageProps) {
+  const { config, overallStatus, monitorGroups, incidents, maintenances } = data;
+  const { design } = config;
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b">
+        <div className="container mx-auto px-4 py-6">
+          {design.logo && (
+            <img
+              src={design.logo}
+              alt={design.name}
+              className="h-8"
+            />
+          )}
+          <h1 className="text-3xl font-bold mt-2">{design.name}</h1>
+          {design.description && (
+            <p className="text-muted-foreground mt-1">{design.description}</p>
+          )}
+        </div>
+      </header>
+
+      {/* Overall Status */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-card rounded-lg p-6 shadow-sm">
+          <h2 className="text-xl font-semibold mb-2">Current Status</h2>
+          <div className="flex items-center gap-2">
+            <div className={`w-3 h-3 rounded-full bg-${overallStatus.color}-500`} />
+            <span className="font-medium">{overallStatus.label}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Monitor Groups */}
+      <div className="container mx-auto px-4 py-4">
+        {monitorGroups.map((group) => (
+          <div key={group.id} className="mb-8">
+            <h3 className="text-lg font-semibold mb-4">{group.name}</h3>
+            {group.monitors.map((monitor) => (
+              <div key={monitor.id} className="bg-card rounded-lg p-4 mb-2 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <span>{monitor.name}</span>
+                  <span className={`text-${monitor.status.color}-600 text-sm font-medium`}>
+                    {monitor.status.label}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      {/* Active Incidents */}
+      {incidents.length > 0 && (
+        <div className="container mx-auto px-4 py-4">
+          <h3 className="text-lg font-semibold mb-4">Active Incidents</h3>
+          {incidents.map((incident) => (
+            <div key={incident.id} className="bg-card rounded-lg p-4 mb-2 shadow-sm">
+              <h4 className="font-medium">{incident.title}</h4>
+              <p className="text-sm text-muted-foreground mt-1">
+                {incident.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+### Step 4: Create Other Required Pages
+
+Create `incident-detail.tsx`:
+
+```typescript app/themes/my-theme/incident-detail.tsx
+import type { ThemeIncidentDetailProps } from "../types";
+
+export default function IncidentDetail({ data }: ThemeIncidentDetailProps) {
+  const { config, incident } = data;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-4">{incident.title}</h1>
+        <p className="text-muted-foreground">{incident.description}</p>
+        {/* Add more incident details */}
+      </div>
+    </div>
+  );
+}
+```
+
+Create `maintenance-detail.tsx`:
+
+```typescript app/themes/my-theme/maintenance-detail.tsx
+import type { ThemeMaintenanceDetailProps } from "../types";
+
+export default function MaintenanceDetail({ data }: ThemeMaintenanceDetailProps) {
+  const { config, maintenance } = data;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-4">{maintenance.title}</h1>
+        <p className="text-muted-foreground">{maintenance.description}</p>
+        {/* Add more maintenance details */}
+      </div>
+    </div>
+  );
+}
+```
+
+Create `updates.tsx`:
+
+```typescript app/themes/my-theme/updates.tsx
+import type { ThemeUpdatesProps } from "../types";
+
+export default function Updates({ data }: ThemeUpdatesProps) {
+  const { config, incidents, maintenances } = data;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Status Updates</h1>
+        {/* List all incidents and maintenances */}
+      </div>
+    </div>
+  );
+}
+```
+
+### Step 5: Register Your Theme
+
+Add your theme to `app/themes/index.ts`:
+
+```typescript app/themes/index.ts
+import type { ThemeModule } from "./types";
+
+// ... other imports ...
+
+import * as myTheme from "./my-theme/manifest";
+
+export const themes: Record<string, ThemeModule> = {
+  // ... other themes ...
+  "my-theme": myTheme,
+};
+```
+
+## Customizing with CSS
+
+The most powerful way to customize your theme is by overriding CSS variables. This allows you to change colors, fonts, shadows, and more without modifying component code.
+
+### Creating Custom CSS
+
+Create `public/themes/my-theme/style.css`:
+
+```css public/themes/my-theme/style.css
+/* Override CSS variables for your theme */
+
+[data-theme="my-theme"] {
+  /* Brand Colors */
+  --primary: oklch(0.45 0.25 264);
+  --primary-foreground: oklch(1 0 0);
+
+  /* Background & Surface */
+  --background: oklch(0.98 0 0);
+  --card: oklch(1 0 0);
+  --border: oklch(0.90 0 0);
+
+  /* Text Colors */
+  --foreground: oklch(0.15 0 0);
+  --muted-foreground: oklch(0.50 0 0);
+
+  /* Status Colors - customize for your brand */
+  --status-operational: oklch(0.60 0.20 150);
+  --status-degraded: oklch(0.70 0.20 85);
+  --status-partial-outage: oklch(0.65 0.22 50);
+  --status-major-outage: oklch(0.55 0.25 25);
+  --status-maintenance: oklch(0.58 0.22 250);
+
+  /* Typography */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Spacing & Borders */
+  --radius: 0.75rem;
+
+  /* Shadows */
+  --shadow-sm: 0px 1px 2px 0px hsl(0 0% 0% / 0.05);
+  --shadow-md: 0px 2px 4px 0px hsl(0 0% 0% / 0.08);
+}
+
+/* Dark mode overrides */
+[data-theme="my-theme"].dark {
+  --background: oklch(0.15 0 0);
+  --foreground: oklch(0.95 0 0);
+  --card: oklch(0.18 0 0);
+  --border: oklch(0.25 0 0);
+}
+```
+
+### Available CSS Variables
+
+#### Colors
+```css
+--background           /* Page background */
+--foreground           /* Primary text */
+--card                 /* Card backgrounds */
+--card-foreground      /* Card text */
+--primary              /* Primary brand color */
+--primary-foreground   /* Text on primary */
+--secondary            /* Secondary color */
+--secondary-foreground /* Text on secondary */
+--muted                /* Muted backgrounds */
+--muted-foreground     /* Muted text */
+--accent               /* Accent color */
+--accent-foreground    /* Text on accent */
+--destructive          /* Destructive actions */
+--destructive-foreground
+--border               /* Border color */
+--input                /* Input backgrounds */
+--ring                 /* Focus ring */
+```
+
+#### Status Colors
+```css
+--status-operational       /* Green - all systems operational */
+--status-degraded          /* Yellow - degraded performance */
+--status-partial-outage    /* Orange - partial outage */
+--status-major-outage      /* Red - major outage */
+--status-maintenance       /* Purple - under maintenance */
+--status-unknown           /* Gray - unknown status */
+```
+
+#### Typography
+```css
+--font-sans    /* Sans-serif font stack */
+--font-serif   /* Serif font stack */
+--font-mono    /* Monospace font stack */
+```
+
+#### Spacing & Effects
+```css
+--radius       /* Border radius (0.5rem default) */
+--spacing      /* Base spacing unit */
+--shadow-sm    /* Small shadow */
+--shadow-md    /* Medium shadow */
+--shadow-lg    /* Large shadow */
+--shadow-xl    /* Extra large shadow */
+--shadow-2xl   /* 2X large shadow */
+```
+
+See `src/index.css` for the complete list of available variables.
+
+## Data Contracts
+
+All theme pages receive standardized data through props:
+
+### ThemePageProps (Main Status Page)
+
+```typescript
+interface ThemePageProps {
+  data: {
+    config: StatusPageConfig;        // Status page configuration
+    overallStatus: OverallStatus;    // Current overall status
+    monitorGroups: MonitorGroup[];   // Grouped monitors
+    incidents: Incident[];           // Active incidents
+    maintenances: Maintenance[];     // Scheduled maintenances
+    recentIncidents: Incident[];     // Recently resolved incidents
+    uptime: UptimeData;             // Uptime statistics
+  };
+}
+```
+
+### ThemeIncidentDetailProps
+
+```typescript
+interface ThemeIncidentDetailProps {
+  data: {
+    config: StatusPageConfig;
+    incident: Incident;
+    updates: IncidentUpdate[];
+  };
+}
+```
+
+### ThemeMaintenanceDetailProps
+
+```typescript
+interface ThemeMaintenanceDetailProps {
+  data: {
+    config: StatusPageConfig;
+    maintenance: Maintenance;
+    updates: MaintenanceUpdate[];
+  };
+}
+```
+
+### ThemeUpdatesProps
+
+```typescript
+interface ThemeUpdatesProps {
+  data: {
+    config: StatusPageConfig;
+    incidents: Incident[];
+    maintenances: Maintenance[];
+  };
+}
+```
+
+See `app/themes/types.ts` for complete type definitions.
+
+## Component Organization
+
+Extract reusable UI elements into components:
+
+```
+app/themes/my-theme/components/
+├── header.tsx          # Page header with logo/title
+├── footer.tsx          # Page footer
+├── status-badge.tsx    # Status indicator badge
+├── monitor-card.tsx    # Monitor display card
+├── incident-card.tsx   # Incident display card
+└── uptime-chart.tsx    # Uptime visualization
+```
+
+Example component:
+
+```typescript app/themes/my-theme/components/status-badge.tsx
+interface StatusBadgeProps {
+  status: "operational" | "degraded" | "partial-outage" | "major-outage";
+  label: string;
+}
+
+export function StatusBadge({ status, label }: StatusBadgeProps) {
+  const colors = {
+    operational: "bg-green-500",
+    degraded: "bg-yellow-500",
+    "partial-outage": "bg-orange-500",
+    "major-outage": "bg-red-500",
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className={`w-3 h-3 rounded-full ${colors[status]}`} />
+      <span className="font-medium">{label}</span>
+    </div>
+  );
+}
+```
+
+## Theme Architecture
+
+### How It Works
+
+Themes are pure rendering components. All theme setup is handled by two files:
+
+1. **`ThemePageWrapper`** (server component):
+   - Renders inline blocking script that sets `data-theme` and `.dark` class before first paint
+   - Loads theme manifest automatically
+   - Renders `ThemeProvider` for client-side hydration
+   - Used by all page dispatchers (app/page.tsx, app/[slug]/page.tsx, etc.)
+
+2. **`ThemeProvider`** (client component):
+   - Syncs theme changes when user switches themes
+   - Dynamically loads custom CSS from manifest
+   - Keeps everything in sync with next-themes
+
+This architecture provides:
+- ✅ **Zero boilerplate** - Theme files are pure rendering components
+- ✅ **No flash** - Inline script sets theme before first paint
+- ✅ **Simple architecture** - Just 2 files handle all theme logic
+- ✅ **Auto CSS loading** - Manifest cssFile loaded automatically
+- ✅ **Type safe** - Proper TypeScript generics throughout
+
+## Best Practices
+
+### 1. Use CSS Variables
+Override CSS variables instead of writing custom styles:
+
+```css
+/* Good - Override variables */
+[data-theme="my-theme"] {
+  --primary: oklch(0.50 0.20 220);
+}
+
+/* Avoid - Custom component styles */
+[data-theme="my-theme"] .button {
+  background: blue;
+}
+```
+
+### 2. Support Dark Mode
+Always provide dark mode overrides if `supportsDarkMode: true`:
+
+```css
+[data-theme="my-theme"].dark {
+  --background: oklch(0.15 0 0);
+  --foreground: oklch(0.95 0 0);
+}
+```
+
+### 3. Extract Components
+Keep theme files clean by extracting reusable components:
+
+```typescript
+// Good
+import { StatusBadge } from "./components/status-badge";
+
+// Use in theme
+<StatusBadge status={status} label={label} />
+```
+
+### 4. Use Tailwind Classes
+Leverage Tailwind utility classes that use CSS variables:
+
+```typescript
+// Good - Uses CSS variables
+<div className="bg-background text-foreground">
+
+// Avoid - Hard-coded colors
+<div className="bg-white text-black">
+```
+
+### 5. Follow Type Contracts
+Use the provided TypeScript types for props:
+
+```typescript
+import type { ThemePageProps } from "../types";
+
+export default function MyTheme({ data }: ThemePageProps) {
+  // TypeScript will ensure you're accessing valid properties
+}
+```
+
+## Testing Your Theme
+
+### Local Development
+
+1. Set up a local UptimeKit instance following the [installation guide](/installation/dashboard)
+2. Add your theme files to `app/themes/`
+3. Register your theme in `app/themes/index.ts`
+4. Create a test status page and select your theme
+5. Test all pages: main, incident detail, maintenance detail, updates
+
+### Test Checklist
+
+- [ ] Main status page renders correctly
+- [ ] Incident detail page works
+- [ ] Maintenance detail page works
+- [ ] Updates page displays properly
+- [ ] Dark mode toggles correctly (if supported)
+- [ ] Custom CSS loads and applies
+- [ ] All monitor statuses display correctly
+- [ ] Responsive design works on mobile/tablet
+- [ ] Logo and branding display properly
+- [ ] Links and navigation work
+
+## Example Themes
+
+Study the included example theme for reference:
+
+- **default** - Classic design with full uptime history and comprehensive monitoring display
+
+## Contributing Your Theme
+
+Once your theme is ready:
+
+1. Test thoroughly following the checklist above
+2. Create a pull request to the UptimeKit repository
+3. Include screenshots of your theme
+4. Document any special features or requirements
+5. Follow the project's contribution guidelines
+
+## Need Help?
+
+- Check existing themes in `app/themes/` for examples
+- Review type definitions in `app/themes/types.ts`
+- Ask questions via [GitHub Issues](https://github.com/uptimekit)
+- Email support at [contact@uptimekit.dev](mailto:contact@uptimekit.dev)
+
+Happy theming!

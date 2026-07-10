@@ -1,0 +1,62 @@
+---
+title: 'Webhook Integration'
+description: 'Receive incident alerts via custom webhooks'
+icon: 'webhook'
+---
+
+The Webhook integration enables you to send JSON payloads to a specific URL whenever an incident event occurs. This is useful for building custom integrations or connecting to services not natively supported.
+
+## Configuration
+
+To set up a webhook, you need to provide the following details:
+
+| Field | Description | Required |
+| --- | --- | --- |
+| URL | The endpoint URL where the POST request will be sent. | Yes |
+| Secret | A secret key sent in the `X-Webhook-Secret` header for verification. | No |
+
+<Steps>
+  <Step title="Setup in UptimeKit">
+    1. Go to **Settings** > **Integrations** in your UptimeKit dashboard.
+    2. Find **Webhook** in the list and click **Configure**.
+    3. Enter your **URL** and optional **Secret**.
+    4. Click **Save Changes**.
+  </Step>
+</Steps>
+
+## Payload Structure
+
+UptimeKit sends a `POST` request with a JSON body containing the event details.
+
+### Headers
+
+```http
+Content-Type: application/json
+X-Webhook-Secret: <your-secret-if-configured>
+```
+
+### Body Example
+
+```json
+{
+  "event": "incident.created",
+  "timestamp": "2023-10-27T10:00:00.000Z",
+  "payload": {
+    "id": "cl...",
+    "title": "API Latency Spike",
+    "status": "investigating",
+    "severity": "major",
+    "description": "We are observing high latency...",
+    ...
+  }
+}
+```
+
+## Supported Events
+
+You will receive events for the following actions:
+
+- `incident.created`
+- `incident.acknowledged`
+- `incident.comment_added`
+- `incident.resolved`

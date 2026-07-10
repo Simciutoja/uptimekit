@@ -1,0 +1,185 @@
+---
+title: 'Monitor Management'
+description: 'Organize and manage your monitors with groups, tags, and automatic SSL certificate tracking'
+icon: 'server'
+---
+
+UptimeKit provides powerful features to help you organize and manage your monitors effectively. This guide covers groups, tags, and automatic SSL certificate monitoring.
+
+## Overview
+
+As your monitoring setup grows, keeping everything organized becomes crucial. UptimeKit offers several features to help you:
+
+- **Groups**: Organize monitors into collapsible sections for better visibility
+- **Tags**: Apply flexible labels with colors for quick identification and filtering
+- **SSL Certificate Monitoring**: Automatic tracking of certificate expiration for HTTPS monitors
+
+## Groups
+
+Groups allow you to organize monitors into logical collections that can be collapsed or expanded in the monitors list.
+
+### Creating Groups
+
+<Steps>
+  <Step title="Navigate to Groups Settings">
+    Go to **Settings** > **Groups** in your dashboard.
+  </Step>
+
+  <Step title="Create a New Group">
+    Click **Create Group** and enter a name for your group (e.g., "API Services", "Frontend", "Databases").
+  </Step>
+
+  <Step title="Assign Monitors">
+    When creating or editing a monitor, select the appropriate group from the dropdown menu.
+  </Step>
+</Steps>
+
+### Use Cases
+
+Groups are ideal for:
+
+- Organizing monitors by service type (API, Frontend, Database)
+- Separating production and staging environments
+- Grouping monitors by team or department
+- Creating logical divisions for different products or projects
+
+<Info>
+  Monitors in the same group will appear together in your monitors list with a collapsible section header, making it easy to focus on specific areas of your infrastructure.
+</Info>
+
+## Tags
+
+Tags provide a flexible labeling system that allows you to categorize monitors across multiple dimensions.
+
+### Creating and Managing Tags
+
+<Steps>
+  <Step title="Navigate to Tags Settings">
+    Go to **Settings** > **Tags** in your dashboard.
+  </Step>
+
+  <Step title="Create a New Tag">
+    Click **Create Tag** and provide:
+    - A name for the tag (e.g., "critical", "external-api", "eu-region")
+    - A color from the 8 available preset colors
+  </Step>
+
+  <Step title="Apply Tags to Monitors">
+    When creating or editing a monitor, you can apply multiple tags from the available list.
+  </Step>
+</Steps>
+
+### Available Colors
+
+Tags come with 8 preset colors to help you create a visual system:
+
+| Color | Example Use Case |
+|-------|------------------|
+| Red | Critical services, production environments |
+| Orange | Important but not critical, staging environments |
+| Yellow | Warning states, services requiring attention |
+| Green | Healthy services, successful states |
+| Blue | Information, documentation, non-critical |
+| Purple | Special projects, experimental services |
+| Pink | Customer-facing services, public APIs |
+| Gray | Deprecated services, inactive monitors |
+
+### Filtering by Tags
+
+Once you've applied tags to your monitors, you can filter the monitors list to show only monitors with specific tags. This makes it easy to focus on particular subsets of your infrastructure.
+
+### Multiple Tags per Monitor
+
+Monitors can have multiple tags, allowing you to create a multi-dimensional categorization system. For example, a monitor might have tags like:
+
+- `critical` (red)
+- `api` (blue)
+- `eu-region` (purple)
+
+<Info>
+  Use tags for attributes that span across groups, such as priority levels, geographic regions, or service types.
+</Info>
+
+## SSL Certificate Monitoring
+
+UptimeKit automatically monitors SSL certificate expiration for all HTTPS monitors, helping you avoid unexpected certificate expiry.
+
+### How It Works
+
+<Steps>
+  <Step title="Automatic Detection">
+    When you create a monitor with an HTTPS URL, UptimeKit automatically begins tracking the SSL certificate associated with that domain.
+  </Step>
+
+  <Step title="Certificate Information">
+    View certificate details including:
+    - Issuer
+    - Expiration date
+    - Days remaining until expiration
+    - Certificate validity status
+  </Step>
+
+  <Step title="Expiration Notifications">
+    UptimeKit sends notifications through your configured integrations when certificates are approaching expiration at these intervals:
+    - 30 days before expiration
+    - 14 days before expiration
+    - 7 days before expiration
+    - 1 day before expiration
+  </Step>
+</Steps>
+
+### Notification Requirements
+
+<Warning>
+  To receive SSL certificate expiration notifications, you must have at least one integration configured (Discord, Telegram, Webhook, or Prometheus AlertManager). Configure integrations in **Settings** > **Integrations**.
+</Warning>
+
+### Best Practices
+
+- Monitor SSL certificates for all production HTTPS endpoints
+- Ensure integrations are configured to receive expiration alerts
+- Set up certificate auto-renewal where possible (e.g., Let's Encrypt with certbot)
+- Test your notification channels regularly to ensure alerts are being received
+
+## Organization Best Practices
+
+Here are some recommended strategies for organizing your monitors effectively:
+
+### Strategy 1: Service-Based Organization
+
+- **Groups**: Organize by service type (API, Frontend, Database, CDN)
+- **Tags**: Add priority levels (critical, high, medium, low) and environments (production, staging)
+
+### Strategy 2: Team-Based Organization
+
+- **Groups**: Organize by team or department (Engineering, DevOps, Infrastructure)
+- **Tags**: Add project names, service types, and geographic regions
+
+### Strategy 3: Environment-Based Organization
+
+- **Groups**: Organize by environment (Production, Staging, Development)
+- **Tags**: Add service types, priority levels, and responsible teams
+
+<Info>
+  You can combine these strategies to create an organization system that works best for your team and infrastructure.
+</Info>
+
+## Example Setup
+
+Here's an example of how you might organize a typical application infrastructure:
+
+**Groups:**
+- API Services
+- Frontend Applications
+- Databases
+- Third-Party Services
+
+**Tags:**
+- `critical` (red) - For mission-critical services
+- `production` (green) - Production environment
+- `staging` (yellow) - Staging environment
+- `api` (blue) - API services
+- `database` (purple) - Database services
+- `external` (orange) - Third-party dependencies
+
+With this setup, you could quickly filter to see all critical production APIs, or all staging databases, or any other combination that helps you monitor your infrastructure effectively.

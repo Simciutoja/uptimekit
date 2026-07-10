@@ -1,0 +1,72 @@
+---
+title: "Introduction"
+description: "Open-source status pages and monitoring for your services"
+icon: "rocket"
+---
+
+UptimeKit is an open-source status page and monitoring system. It helps you monitor services, publish status pages, and communicate incidents with your users.
+
+## Key Features
+
+- **Uptime monitoring**: Monitor HTTP/HTTPS, TCP, ICMP Ping, DNS, Keyword, and HTTP JSON checks.
+- **Status pages**: Create public or private status pages with custom domains and password protection.
+- **Monitor organization**: Organize monitors with groups and tags.
+- **SSL certificate tracking**: Track certificate expiration automatically for HTTPS monitors.
+- **Incident management**: Create, update, and resolve incidents from the dashboard or integrations.
+- **Integrations**: Connect Discord, Telegram, Prometheus AlertManager, Apprise, and custom webhooks.
+- **Team collaboration**: Invite team members and manage access with organization roles.
+- **Open source**: Self-host UptimeKit and extend it for your own needs.
+
+## Comparison with Uptime Kuma
+
+UptimeKit and [Uptime Kuma](https://github.com/louislam/uptime-kuma) are both open-source monitoring tools. Uptime Kuma is a good fit for simple, single-node setups. UptimeKit is designed for teams that need distributed monitoring, structured incidents, and scalable storage.
+
+| Category | UptimeKit | Uptime Kuma |
+| --- | --- | --- |
+| **Architecture** | Dashboard with separate worker services | Single-node application |
+| **Storage** | PostgreSQL with optional time-series storage | SQLite/MariaDB |
+| **HTTP/HTTPS** | Yes | Yes |
+| **TCP** | Yes | Yes |
+| **ICMP Ping** | Yes | Yes |
+| **DNS** | Yes | Yes |
+| **Keyword checks** | Yes | Yes |
+| **HTTP JSON checks** | Yes | No |
+| **Multi-region monitoring** | Yes | No |
+| **Configurable intervals** | Yes | Yes |
+| **SSL certificate tracking** | Yes | Yes |
+| **Incident management** | Incidents with status transitions, severity, comments, and resolution flow | Basic status and maintenance features |
+| **Custom status-page domains** | Yes | No |
+| **Password protection** | Yes | Yes |
+| **Multiple status pages** | Yes | Yes |
+| **Status page themes** | Yes | custom css only |
+| **Public incident reports** | Yes | Limited |
+| **Email subscribers** | Yes | No |
+| **Subscriber webhooks** | Yes | No |
+| **Notifications** | Discord, Telegram, Prometheus AlertManager, Apprise, and webhooks | Broad built-in notification support |
+| **Team collaboration** | Organizations, roles, invitations, and scoped API keys | Basic multi-user support |
+| **Scalability** | Built for distributed workers and time-series data | Best suited for small single-node deployments |
+
+### When to choose UptimeKit
+
+Choose UptimeKit if you need:
+
+- Multi-region monitoring
+- Multiple status pages for teams or organizations
+- Structured incident management
+- Time-series storage for monitor history
+- Prometheus AlertManager, Apprise, or webhook-based automation
+
+### When to choose Uptime Kuma
+
+Choose Uptime Kuma if you need:
+
+- A simple single-container deployment
+- A lightweight setup for personal or small-scale monitoring
+- Minimal infrastructure requirements
+
+## Quick Start
+
+To run UptimeKit, start with the installation guides:
+
+- [Dashboard Installation](/installation/dashboard)
+- [Worker Installation](/installation/worker)
