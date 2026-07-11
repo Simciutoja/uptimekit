@@ -68,13 +68,8 @@ Follow these steps to get UptimeKit running locally on your machine.
 APP_SECRET=change_me_to_a_secure_secret
 APP_URL=http://localhost:3000
 
-
 # Status Page Configuration (Optional)
 APP_STATUS_PAGE_DOMAIN=status.example.com
-
-# Optional ports to be exposed
-DASH_PORT=3000
-STATUS_PAGE_PORT=3001
 ```
 
 3. **Start the docker compose**
