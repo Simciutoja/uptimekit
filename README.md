@@ -22,6 +22,7 @@
 </div>
 
 <!--![GitHub Stars](https://www.shieldcn.dev/github/stars/uptimekit/uptimekit.svg?variant=secondary) ![Last commit](https://www.shieldcn.dev/github/last-commit/uptimekit/uptimekit.svg?variant=secondary) ![Release](https://www.shieldcn.dev/github/release/uptimekit/uptimekit.svg) ![CI](https://www.shieldcn.dev/github/ci/uptimekit/uptimekit.svg?variant=secondary) ![License](https://www.shieldcn.dev/github/license/uptimekit/uptimekit.svg?variant=branded)-->
+
 ![badges](https://shieldcn.dev/group/github/stars/uptimekit/uptimekit+github/forks/uptimekit/uptimekit+github/license/uptimekit/uptimekit.svg?variant=outline)
 
 <br/>
@@ -48,6 +49,7 @@ The workers check with the app every 15 seconds to get their assigned monitors a
 Follow these steps to get UptimeKit running locally on your machine.
 
 ### Prerequisites
+
 - Redis
 - PostgreSQL
 - Clickhouse (optional)
@@ -61,23 +63,19 @@ Follow these steps to get UptimeKit running locally on your machine.
     ```
 
 2. **Edit these variables in the .env**
-  ```bash
-  APP_SECRET=change_me_to_a_secure_secret
-  APP_URL=http://localhost:3000
 
-  # Backwards compatible: these older names still work too
-  # BETTER_AUTH_SECRET=change_me_to_a_secure_secret
-  # BETTER_AUTH_URL=http://localhost:3000
-  # NEXT_PUBLIC_URL=http://localhost:3000
+```bash
+APP_SECRET=change_me_to_a_secure_secret
+APP_URL=http://localhost:3000
 
-  # Status Page Configuration (Optional)
-  APP_STATUS_PAGE_DOMAIN=status.example.com
-  # NEXT_PUBLIC_STATUS_PAGE_DOMAIN=status.example.com
 
-  # Optional ports to be exposed
-  DASH_PORT=3000
-  STATUS_PAGE_PORT=3001
-  ```
+# Status Page Configuration (Optional)
+APP_STATUS_PAGE_DOMAIN=status.example.com
+
+# Optional ports to be exposed
+DASH_PORT=3000
+STATUS_PAGE_PORT=3001
+```
 
 3. **Start the docker compose**
 
@@ -87,43 +85,15 @@ Follow these steps to get UptimeKit running locally on your machine.
 
 4. Now follow the steps on the app. Enjoy :D
 
-### Manual installation
+## 🎫 Support
 
-1. **Clone the repository**
+Need help with UptimeKit? Join our community support room on Matrix:
 
-    ```bash
-    git clone https://github.com/uptimekit/uptimekit.git
-    cd uptimekit
-    ```
+**[Join the UptimeKit Matrix room](https://matrix.to/#/#uptimekit:irazz.lol)**
 
-2. **Install dependencies**
+Room address: `#uptimekit:irazz.lol`
 
-    ```bash
-    pnpm install
-    ```
-
-3. **Environment Setup**
-
-    Copy the `.env.example` file in `.env`
-
-4. **Database Setup**
-
-    Push the schema to your database:
-
-    ```bash
-    pnpm run db:push
-    ```
-
-5. **Run Development Server**
-
-    Start all applications (Dashboard, Status Page, Marketing/Docs):
-
-    ```bash
-    pnpm run dev
-    ```
-
-    - **Dashboard**: [http://localhost:3000](http://localhost:3000)
-    - **Status Page**: [http://localhost:3001](http://localhost:3001)
+Use the room to ask questions, report problems, and connect with other UptimeKit users and contributors.
 
 ## 📂 Project Structure
 
@@ -145,7 +115,6 @@ uptimekit/
 ## 💝 Sponsors
 
 Thank you to all our amazing sponsors who make this project possible!
-
 
 **[Become a sponsor](https://github.com/sponsors/irazvan2745)** and get your logo here!
 
