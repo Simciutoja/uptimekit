@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { useState } from "react";
+import { RechartsBoundary } from "@/components/monitors/recharts-boundary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     Select,
@@ -93,22 +93,15 @@ export function StatusCodePieChart({ monitorId }: StatusCodePieChartProps) {
         }),
     );
 
-    const total = useMemo(
-        () => data.reduce((sum, point) => sum + point.count, 0),
-        [data],
-    );
+    const total = data.reduce((sum, point) => sum + point.count, 0);
 
-    const chartData = useMemo(
-        () =>
-            data.map((point, index) => ({
-                statusCode: point.statusCode,
-                label: String(point.statusCode),
-                count: point.count,
-                percentage: total > 0 ? (point.count / total) * 100 : 0,
-                fill: STATUS_CODE_COLORS[index % STATUS_CODE_COLORS.length],
-            })),
-        [data, total],
-    );
+    const chartData = data.map((point, index) => ({
+        statusCode: point.statusCode,
+        label: String(point.statusCode),
+        count: point.count,
+        percentage: total > 0 ? (point.count / total) * 100 : 0,
+        fill: STATUS_CODE_COLORS[index % STATUS_CODE_COLORS.length],
+    }));
 
     return (
         <Card>
@@ -151,42 +144,63 @@ export function StatusCodePieChart({ monitorId }: StatusCodePieChartProps) {
                 ) : (
                     <div className="grid gap-6 md:grid-cols-[minmax(220px,1fr)_minmax(180px,240px)] md:items-center">
                         <div className="h-56 min-w-0">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart
-                                    margin={{
-                                        top: 4,
-                                        right: 4,
-                                        bottom: 4,
-                                        left: 4,
-                                    }}
-                                >
-                                    <Pie
-                                        data={chartData}
-                                        dataKey="count"
-                                        nameKey="label"
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={58}
-                                        outerRadius={92}
-                                        paddingAngle={2}
-                                        stroke="transparent"
+                            <RechartsBoundary
+                                fallback={
+                                    <div className="flex h-full items-center justify-center text-muted-foreground text-sm">
+                                        Loading chart...
+                                    </div>
+                                }
+                            >
+                                {({
+                                    ResponsiveContainer,
+                                    PieChart,
+                                    Pie,
+                                    Cell,
+                                    Tooltip,
+                                }) => (
+                                    <ResponsiveContainer
+                                        width="100%"
+                                        height="100%"
                                     >
-                                        {chartData.map((point) => (
-                                            <Cell
-                                                key={point.statusCode}
-                                                fill={point.fill}
+                                        <PieChart
+                                            margin={{
+                                                top: 4,
+                                                right: 4,
+                                                bottom: 4,
+                                                left: 4,
+                                            }}
+                                        >
+                                            <Pie
+                                                data={chartData}
+                                                dataKey="count"
+                                                nameKey="label"
+                                                cx="50%"
+                                                cy="50%"
+                                                innerRadius={58}
+                                                outerRadius={92}
+                                                paddingAngle={2}
                                                 stroke="transparent"
+                                            >
+                                                {chartData.map((point) => (
+                                                    <Cell
+                                                        key={point.statusCode}
+                                                        fill={point.fill}
+                                                        stroke="transparent"
+                                                    />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip
+                                                content={
+                                                    <StatusCodeTooltip
+                                                        total={total}
+                                                    />
+                                                }
+                                                cursor={false}
                                             />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip
-                                        content={
-                                            <StatusCodeTooltip total={total} />
-                                        }
-                                        cursor={false}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                )}
+                            </RechartsBoundary>
                         </div>
                         <div className="space-y-3">
                             <div className="text-muted-foreground text-sm">
