@@ -42,7 +42,8 @@ import { dedupeNotificationConfigs, IntegrationService } from "./service";
 
 describe("notification config selection", () => {
     beforeEach(() => {
-        mocks.handler.mockClear();
+        mocks.handler.mockReset();
+        mocks.handler.mockResolvedValue(undefined);
         mocks.incidentMonitors = [];
         mocks.assignedConfigs = [];
         mocks.defaultConfigs = [];
@@ -59,21 +60,18 @@ describe("notification config selection", () => {
         ]);
     });
 
-    it("sends incident events to notification configs assigned to the incident monitor", async () => {
-        mocks.incidentMonitors = [{ monitorId: "monitor-1" }];
-        mocks.assignedConfigs = [
-            {
-                config: {
-                    id: "config-1",
-                    type: "test-monitor-assigned",
-                    config: { url: "https://example.com/webhook" },
-                },
-            },
-        ];
+    it("sends configured incident events to every active channel", async () => {
+        const channel: Record<string, unknown> = {
+            id: "config-1",
+            type: "test-channel",
+            config: { url: "https://example.com/webhook" },
+            enabledEvents: null,
+        };
+        mocks.defaultConfigs = [channel];
 
         integrationRegistry.register({
-            id: "test-monitor-assigned",
-            name: "Test Monitor Assigned",
+            id: "test-channel",
+            name: "Test Channel",
             type: "export",
             description: "Test integration",
             configSchema: { parse: (value: unknown) => value } as any,
@@ -90,7 +88,7 @@ describe("notification config selection", () => {
                 incidentId: "incident-1",
                 organizationId: "org-1",
                 title: "Monitor is down",
-                severity: "major",
+                severity: "maintenance",
             },
             attempts: 1,
             createdAt: new Date("2026-06-01T10:00:00.000Z"),
@@ -104,5 +102,39 @@ describe("notification config selection", () => {
             "incident.created",
             event.payload,
         );
+
+        mocks.handler.mockClear();
+        channel.enabledEvents = [];
+
+        await service.handleAppEvent(event);
+
+        expect(mocks.handler).not.toHaveBeenCalled();
+
+        channel.enabledEvents = ["incident.created"];
+        mocks.handler.mockRejectedValueOnce(new Error("offline"));
+
+        await expect(service.handleAppEvent(event)).rejects.toThrow(
+            "Failed to deliver incident.created",
+        );
+
+        const healthyHandler = vi.fn(async () => undefined);
+        mocks.defaultConfigs.push({
+            ...channel,
+            id: "config-2",
+            type: "healthy-channel",
+        });
+        integrationRegistry.register({
+            id: "healthy-channel",
+            name: "Healthy Channel",
+            type: "export",
+            description: "Healthy test integration",
+            configSchema: { parse: (value: unknown) => value } as any,
+            events: ["incident.created"],
+            handler: healthyHandler,
+        });
+        mocks.handler.mockRejectedValueOnce(new Error("still offline"));
+
+        await expect(service.handleAppEvent(event)).resolves.toBeUndefined();
+        expect(healthyHandler).toHaveBeenCalledOnce();
     });
 });
