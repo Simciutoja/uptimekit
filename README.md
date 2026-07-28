@@ -6,13 +6,13 @@
   <h1 align="center">UptimeKit</h1>
 
   <p align="center">
-    <img src="https://shieldcn.dev/group/github/stars/uptimekit/uptimekit+github/forks/uptimekit/uptimekit+github/license/uptimekit/uptimekit.svg?variant=outline" alt="badges">
-  </p>
-
-  <p align="center">
     <strong>The modern open-source status page and monitoring solution.</strong>
   </p>
   
+  <p align="center">
+    <img src="https://shieldcn.dev/group/github/stars/uptimekit/uptimekit+github/forks/uptimekit/uptimekit+github/license/uptimekit/uptimekit.svg?variant=outline" alt="badges">
+  </p>
+
   <br/>
 
   <img src="https://r2.uptimekit.dev/banners/banner-smaller.png" alt="UptimeKit Banner" width="100%">
