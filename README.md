@@ -20,24 +20,24 @@
 <!--![GitHub Stars](https://www.shieldcn.dev/github/stars/uptimekit/uptimekit.svg?variant=secondary) ![Last commit](https://www.shieldcn.dev/github/last-commit/uptimekit/uptimekit.svg?variant=secondary) ![Release](https://www.shieldcn.dev/github/release/uptimekit/uptimekit.svg) ![CI](https://www.shieldcn.dev/github/ci/uptimekit/uptimekit.svg?variant=secondary) ![License](https://www.shieldcn.dev/github/license/uptimekit/uptimekit.svg?variant=branded)-->
 <br/>
 
-## ✨ Features
+## Features
 
 UptimeKit is designed to be the all-in-one solution for tracking your services' uptime and communicating with your users.
 
-- 📊 **Monitoring** - Real-time uptime monitoring for your HTTP/TCP services.
-- 🚦 **Status Pages** - Beautiful, customizable status pages for your users.
-- 🔔 **Incidents** - Create and manage incident reports to keep users informed.
-- 🏢 **Organizations** - Multi-tenant support with team management.
-- 📈 **Analytics** - Detailed uptime and response time metrics.
-- 🛠️ **Self-Hostable** - Full control over your data and infrastructure.
-- 🔗 **Instatus Integration** - Display monitors from external instatus pages on your status page,
+- **Monitoring** - Real-time uptime monitoring for your HTTP/TCP services.
+- **Status Pages** - Beautiful, customizable status pages for your users.
+- **Incidents** - Create and manage incident reports to keep users informed.
+- **Organizations** - Multi-tenant support with team management.
+- **Analytics** - Detailed uptime and response time metrics.
+- **Self-Hostable** - Full control over your data and infrastructure.
+- **Instatus Integration** - Display monitors from external instatus pages on your status page,
 
 ## How it works
 
 Uptimekit is a distributed monitoring solution. You can have as many workers as you want and as many replicas of the app as you want.
 The workers check with the app every 15 seconds to get their assigned monitors and run the checks whenever they have to.
 
-## 🛠️ Getting Started
+## Getting Started
 
 Follow these steps to get UptimeKit running locally on your machine.
 
@@ -73,7 +73,7 @@ APP_STATUS_PAGE_DOMAIN=status.example.com
 
 4. Now follow the steps on the app. Enjoy :D
 
-## 🎫 Support
+## Support
 
 Need help with UptimeKit? Join our community support room on Matrix:
 
@@ -83,7 +83,7 @@ Room address: `#uptimekit:irazz.lol`
 
 Use the room to ask questions, report problems, and connect with other UptimeKit users and contributors.
 
-## 📂 Project Structure
+## Project Structure
 
 ```bash
 uptimekit/
@@ -95,7 +95,6 @@ uptimekit/
 │   ├── api/           # Shared API definition & logic
 │   ├── auth/          # Authentication configuration
 │   ├── db/            # Database schema & Drizzle config
-│   ├── scheduler/     # Scheduler application
 │   └── config/        # Shared configuration (TS, ESLint, etc.)
 └── ....
 ```
@@ -106,20 +105,6 @@ Thank you to all our amazing sponsors who make this project possible!
 
 **[Become a sponsor](https://github.com/sponsors/irazvan2745)** and get your logo here!
 
-## 👀 Previews
-
-### Default theme with length bars
-
-![image](https://r2.uptimekit.dev/previews/default-lenght.png)
-
-### Flat theme with length bars
-
-![image](https://r2.uptimekit.dev/previews/flat-lenght.png)
-
-### Signal theme with signal bars
-
-![image](https://r2.uptimekit.dev/previews/signal-signal.png)
-
 ## 🤝 Contributing
 
 We welcome contributions! Please check out our [Contributing Guide](CONTRIBUTING.md) for details on how to submit pull requests, report issues, and request features.
@@ -127,6 +112,18 @@ We welcome contributions! Please check out our [Contributing Guide](CONTRIBUTING
 ## 📄 License
 
 This project is licensed under a [MIT License](LICENSE)
+
+---
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=uptimekit%2Fuptimekit&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=uptimekit/uptimekit&type=date&theme=dark&legend=top-left&sealed_token=pZxQDdxjnggzp90uakNdKGMS2_ZxGHDzplL-N6q4bl78Vy0v-waIwW6XEjHSJjhu6OSbMA0N0TL_W72AhXOT5W4iYhOmNQOKeeOtyJsK5-4w2HJDnEuLsA" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=uptimekit/uptimekit&type=date&legend=top-left&sealed_token=pZxQDdxjnggzp90uakNdKGMS2_ZxGHDzplL-N6q4bl78Vy0v-waIwW6XEjHSJjhu6OSbMA0N0TL_W72AhXOT5W4iYhOmNQOKeeOtyJsK5-4w2HJDnEuLsA" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=uptimekit/uptimekit&type=date&legend=top-left&sealed_token=pZxQDdxjnggzp90uakNdKGMS2_ZxGHDzplL-N6q4bl78Vy0v-waIwW6XEjHSJjhu6OSbMA0N0TL_W72AhXOT5W4iYhOmNQOKeeOtyJsK5-4w2HJDnEuLsA" />
+ </picture>
+</a>
 
 ---
 
