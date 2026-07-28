@@ -115,6 +115,7 @@ This project is licensed under a [MIT License](LICENSE)
 
 ---
 
+<!-- timeouts?
 ## Star History
 
 <a href="https://www.star-history.com/?repos=uptimekit%2Fuptimekit&type=date&legend=top-left">
@@ -125,7 +126,7 @@ This project is licensed under a [MIT License](LICENSE)
  </picture>
 </a>
 
----
+--- -->
 
 <div align="center">
   <sub>Built with ❤️ by the UptimeKit Team</sub>
