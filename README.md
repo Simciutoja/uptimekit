@@ -6,6 +6,10 @@
   <h1 align="center">UptimeKit</h1>
 
   <p align="center">
+    <img src="https://shieldcn.dev/group/github/stars/uptimekit/uptimekit+github/forks/uptimekit/uptimekit+github/license/uptimekit/uptimekit.svg?variant=outline" alt="badges">
+  </p>
+
+  <p align="center">
     <strong>The modern open-source status page and monitoring solution.</strong>
   </p>
 
@@ -20,10 +24,6 @@
   <img src="https://r2.uptimekit.dev/banners/banner-smaller.png" alt="UptimeKit Banner" width="100%">
 </div>
 <!--![GitHub Stars](https://www.shieldcn.dev/github/stars/uptimekit/uptimekit.svg?variant=secondary) ![Last commit](https://www.shieldcn.dev/github/last-commit/uptimekit/uptimekit.svg?variant=secondary) ![Release](https://www.shieldcn.dev/github/release/uptimekit/uptimekit.svg) ![CI](https://www.shieldcn.dev/github/ci/uptimekit/uptimekit.svg?variant=secondary) ![License](https://www.shieldcn.dev/github/license/uptimekit/uptimekit.svg?variant=branded)-->
-<p align="center">
-  <img src="https://shieldcn.dev/group/github/stars/uptimekit/uptimekit+github/forks/uptimekit/uptimekit+github/license/uptimekit/uptimekit.svg?variant=outline" alt="badges">
-</p>
-
 <br/>
 
 ## ✨ Features
