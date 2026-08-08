@@ -789,7 +789,7 @@ function GroupCard({
 
             <CardContent className="relative space-y-6 p-6 pt-6">
                 {onRemove && (
-                    <div className="absolute top-[44px] right-4 z-20">
+                    <div className="absolute top-[50px] right-4 z-20">
                         <Button
                             variant="ghost"
                             size="icon"
@@ -1067,9 +1067,9 @@ function MonitorRow({
         <>
             <div
                 className={cn(
-                    "group flex items-center gap-3 rounded-md p-3 transition-all hover:bg-muted/40",
+                    "group flex items-center gap-3 rounded-md p-3 backdrop-blur-md transition-all hover:bg-muted/90",
                     isOverlay && "border bg-background shadow-lg",
-                    isDragging && "opacity-50",
+                    isDragging && "bg-muted/90",
                 )}
             >
                 {/* Drag Handle */}

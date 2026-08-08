@@ -1356,10 +1356,10 @@ function CustomDomainSection({
                                     </FormControl>
                                 </div>
                                 <FormDescription>
-                                    Subdomains usually use CNAME. Apex domains
-                                    can work too when your DNS provider supports
-                                    ALIAS, ANAME, or an equivalent root-domain
-                                    target.
+                                    Create a CNAME record to your uptimekit
+                                    instance and a reverse proxy pointing to the
+                                    same address as uptimekit dashboard itself.
+                                    This works by using the HOST header
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
