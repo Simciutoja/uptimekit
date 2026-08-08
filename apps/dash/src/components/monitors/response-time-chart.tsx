@@ -1578,13 +1578,13 @@ function ResponseTimeChartCardSection2({
                     >
                         <TabsList
                             aria-label="Latency chart mode"
-                            className="[&_[data-slot=tab-indicator]]:h-8"
+                            className="**:data-[slot=tab-indicator]:h-8"
                         >
-                            <TabsTrigger className="h-8" value="percentiles">
-                                Percentiles
-                            </TabsTrigger>
                             <TabsTrigger className="h-8" value="average">
                                 AVG
+                            </TabsTrigger>
+                            <TabsTrigger className="h-8" value="percentiles">
+                                Percentiles
                             </TabsTrigger>
                         </TabsList>
                     </Tabs>
@@ -2927,37 +2927,6 @@ function ResponseTimeChartView({ model }: { model: ResponseTimeChartModel }) {
         <div className="space-y-6">
             <DashboardHeaderActions>
                 <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                        <span className="hidden lg:inline">Quantile</span>
-                        <Select
-                            aria-label="Global quantile"
-                            value={latencyQuantile}
-                            onValueChange={(value) =>
-                                updateChartState({
-                                    latencyQuantile: value as QuantileKey,
-                                })
-                            }
-                        >
-                            <SelectTrigger className="h-8 w-[86px] bg-background/60 text-foreground">
-                                <SelectValue>
-                                    {
-                                        QUANTILE_OPTIONS.find(
-                                            (option) =>
-                                                option.value ===
-                                                latencyQuantile,
-                                        )?.label
-                                    }
-                                </SelectValue>
-                            </SelectTrigger>
-                            <SelectContent>
-                                {QUANTILE_OPTIONS.map(({ label, value }) => (
-                                    <SelectItem key={value} value={value}>
-                                        {label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
                     <div className="flex items-center gap-2 text-muted-foreground text-sm">
                         <span className="hidden lg:inline">Period</span>
                         <Select
