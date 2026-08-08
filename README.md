@@ -13,6 +13,9 @@
     <img src="https://shieldcn.dev/group/github/stars/uptimekit/uptimekit+github/forks/uptimekit/uptimekit+github/license/uptimekit/uptimekit.svg?variant=outline" alt="badges">
   </p>
 
+  <img width="1622" height="996" alt="image" src="https://github.com/user-attachments/assets/b8343ad2-c5b9-4886-a308-2609d559fe09" />
+
+
   <br/>
 <!-- looks kinda bad
   <img src="https://r2.uptimekit.dev/banners/banner-smaller.png" alt="UptimeKit Banner" width="100%"> -->
