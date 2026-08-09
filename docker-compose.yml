@@ -8,13 +8,10 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/uptimekit
       - TIMESERIES_BACKEND=${TIMESERIES_BACKEND:-timescale}
-      - REDIS_URL=redis://redis:6379
       - APPRISE_URL=http://apprise:8000
     depends_on:
       db:
         condition: service_healthy
-      redis:
-        condition: service_started
       apprise:
         condition: service_started
     healthcheck:
@@ -45,12 +42,6 @@ services:
       start_period: 10s
     restart: always
 
-  redis:
-    image: redis:8.0-alpine
-    volumes:
-      - redis_data:/data
-    restart: always
-
   apprise:
     image: caronc/apprise:latest
     environment:
@@ -59,4 +50,3 @@ services:
 
 volumes:
   db_data:
-  redis_data:

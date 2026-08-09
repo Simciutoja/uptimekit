@@ -5,12 +5,12 @@ describe("runReadinessChecks", () => {
     it("reports healthy when every dependency responds", async () => {
         const result = await runReadinessChecks({
             database: async () => undefined,
-            redis: async () => "PONG",
+            timeseries: async () => undefined,
         });
 
         expect(result.ok).toBe(true);
         expect(result.checks.database?.ok).toBe(true);
-        expect(result.checks.redis?.ok).toBe(true);
+        expect(result.checks.timeseries?.ok).toBe(true);
     });
 
     it("reports unhealthy without exposing dependency errors", async () => {
@@ -30,7 +30,7 @@ describe("runReadinessChecks", () => {
     it("times out stalled dependencies", async () => {
         vi.useFakeTimers();
         const resultPromise = runReadinessChecks(
-            { redis: () => new Promise(() => undefined) },
+            { timeseries: () => new Promise(() => undefined) },
             100,
         );
 
@@ -39,6 +39,6 @@ describe("runReadinessChecks", () => {
         vi.useRealTimers();
 
         expect(result.ok).toBe(false);
-        expect(result.checks.redis?.ok).toBe(false);
+        expect(result.checks.timeseries?.ok).toBe(false);
     });
 });

@@ -11,7 +11,6 @@ import { and, asc, desc, eq, ilike, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure, writeProcedure } from "../index";
 import { hashPassword } from "../lib/password";
-import { redis } from "../lib/redis";
 import { normalizeStatusPageDomain } from "../lib/status-page-domain";
 import { subscribersRouter } from "./subscribers";
 
@@ -334,19 +333,6 @@ export const statusPagesRouter = {
                 })
                 .where(eq(statusPage.id, input.id));
 
-            // Invalidate cache
-            if (existing.domain) {
-                await redis.del(`status-page:${existing.domain}`);
-            }
-            if (normalizedDomain && normalizedDomain !== existing.domain) {
-                await redis.del(`status-page:${normalizedDomain}`);
-            }
-            // Invalidate slug-based cache
-            await redis.del(`status-page:slug:${existing.slug}`);
-            if (input.slug && input.slug !== existing.slug) {
-                await redis.del(`status-page:slug:${input.slug}`);
-            }
-
             return { success: true };
         }),
 
@@ -517,13 +503,6 @@ export const statusPagesRouter = {
                 }
             });
 
-            // Invalidate cache
-            if (existing.domain) {
-                await redis.del(`status-page:${existing.domain}`);
-            }
-            // Invalidate slug-based cache
-            await redis.del(`status-page:slug:${existing.slug}`);
-
             return { success: true };
         }),
 
@@ -556,13 +535,6 @@ export const statusPagesRouter = {
             }
 
             await db.delete(statusPage).where(eq(statusPage.id, input.id));
-
-            // Invalidate cache
-            if (existing.domain) {
-                await redis.del(`status-page:${existing.domain}`);
-            }
-            // Invalidate slug-based cache
-            await redis.del(`status-page:slug:${existing.slug}`);
 
             return { success: true };
         }),
