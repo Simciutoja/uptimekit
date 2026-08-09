@@ -46,7 +46,6 @@ Follow these steps to get UptimeKit running locally on your machine.
 
 ### Prerequisites
 
-- Redis
 - PostgreSQL
 - Clickhouse (optional)
 

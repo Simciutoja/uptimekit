@@ -18,7 +18,8 @@ rss: true
   - **Monitor filtering:** Corrected status-filtered pagination so page contents and total counts match, and constrained pagination inputs to safe integer ranges.
   - **Worker scalability:** Added configurable `WORKER_MAX_CONCURRENCY` limits, scheduler backpressure, and tests preventing unbounded simultaneous monitor checks.
   - **Multi-replica safety:** Added PostgreSQL advisory locking around monitor event processing so multiple dashboard replicas serialize updates for the same monitor.
-  - **Health checks:** Replaced the static health response with timed readiness checks for PostgreSQL, Redis, and the selected time-series backend, returning HTTP 503 when a dependency is unavailable.
+  - **Health checks:** Replaced the static health response with timed readiness checks for PostgreSQL and the selected time-series backend, returning HTTP 503 when a dependency is unavailable.
+  - **Simpler deployments:** Removed Redis and moved status-page password throttling to PostgreSQL.
   - **Subscriber notifications:** Status-page subscribers now receive incident-created and incident-updated messages in addition to acknowledgement and resolution notifications.
   - **Frontend correctness:** Fixed Alertmanager and OIDC hydration mismatches, improved accessible interaction targets and SVG titles, and removed remaining error-level Biome diagnostics.
   - **Demo environment:** Expanded seeded demo data with multi-region workers, nested groups, tags, monitors, incidents, maintenance windows, integrations, subscribers, SSL data, and 30 days of time-series history.

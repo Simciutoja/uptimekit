@@ -42,9 +42,6 @@ fi
 echo ">>> Starting PostgreSQL..."
 run_as_postgres "pg_ctl -D '$PGDATA' -l /tmp/pg.log -w start"
 
-echo ">>> Starting Redis..."
-redis-server --daemonize yes --loglevel warning
-
 # ---- Migrations ----
 echo ">>> Running database migrations..."
 ./node_modules/.bin/tsx packages/db/src/migrate.ts

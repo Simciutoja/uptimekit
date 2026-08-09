@@ -28,9 +28,6 @@ import {
     type IncidentHistoryPeriod,
 } from "./incident-history";
 
-// ... existing functions
-import { redis } from "./redis";
-
 // Retry wrapper for database queries to handle connection issues during startup
 async function withRetry<T>(
     fn: () => Promise<T>,
@@ -65,36 +62,6 @@ async function withRetry<T>(
         }
     }
     throw lastError;
-}
-
-// Helper to cache data in Redis
-// TTL in seconds
-async function cached<T>(
-    key: string,
-    ttl: number,
-    fetcher: () => Promise<T>,
-): Promise<T> {
-    try {
-        const cachedData = await redis.get(key);
-        if (cachedData) {
-            return JSON.parse(cachedData) as T;
-        }
-    } catch (error) {
-        console.error(`Redis get error for key ${key}:`, error);
-    }
-
-    // Wrap fetcher with retry logic for database connection issues
-    const data = await withRetry(fetcher);
-
-    try {
-        if (data !== undefined) {
-            await redis.set(key, JSON.stringify(data), "EX", ttl);
-        }
-    } catch (error) {
-        console.error(`Redis set error for key ${key}:`, error);
-    }
-
-    return data;
 }
 
 async function getPublishedIncidentRecords(
@@ -219,132 +186,117 @@ function mapPublishedMaintenanceRecord(
 }
 
 export const getStatusPageEvents = async (statusPageId: string, days = 90) => {
-    return cached(
-        `status-page:events:${statusPageId}:${days}`,
-        60, // 1 minute
-        async () => {
-            const startDate = new Date();
-            startDate.setDate(startDate.getDate() - days);
+    return withRetry(async () => {
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - days);
 
-            const [reports, maintenances] = await Promise.all([
-                getPublishedIncidentRecords(statusPageId, {
-                    cutoff: startDate,
-                }).then((records) =>
-                    records
-                        .map(mapPublishedIncidentRecord)
-                        .sort(
-                            (a, b) =>
-                                new Date(b.startedAt).getTime() -
-                                new Date(a.startedAt).getTime(),
-                        ),
-                ),
-                getPublishedIncidentRecords(statusPageId, {
-                    cutoff: startDate,
-                    maintenanceOnly: true,
-                }).then((records) =>
-                    records
-                        .map(mapPublishedMaintenanceRecord)
-                        .sort(
-                            (a, b) =>
-                                new Date(b.startAt).getTime() -
-                                new Date(a.startAt).getTime(),
-                        ),
-                ),
-            ]);
+        const [reports, maintenances] = await Promise.all([
+            getPublishedIncidentRecords(statusPageId, {
+                cutoff: startDate,
+            }).then((records) =>
+                records
+                    .map(mapPublishedIncidentRecord)
+                    .sort(
+                        (a, b) =>
+                            new Date(b.startedAt).getTime() -
+                            new Date(a.startedAt).getTime(),
+                    ),
+            ),
+            getPublishedIncidentRecords(statusPageId, {
+                cutoff: startDate,
+                maintenanceOnly: true,
+            }).then((records) =>
+                records
+                    .map(mapPublishedMaintenanceRecord)
+                    .sort(
+                        (a, b) =>
+                            new Date(b.startAt).getTime() -
+                            new Date(a.startAt).getTime(),
+                    ),
+            ),
+        ]);
 
-            return { reports, maintenances };
-        },
-    );
+        return { reports, maintenances };
+    });
 };
 
 export type StatusPageData = NonNullable<
     Awaited<ReturnType<typeof getStatusPageByDomain>>
 >;
 
-export const getStatusPageByDomain = async (domain: string) => {
-    return cached(
-        `status-page:${domain}`,
-        600, // 10 minutes
-        async () => {
-            const page = await db.query.statusPage.findFirst({
-                where: eq(statusPage.domain, domain),
-            });
+export const getStatusPageByDomain = cache(async (domain: string) => {
+    return withRetry(async () => {
+        const page = await db.query.statusPage.findFirst({
+            where: eq(statusPage.domain, domain),
+        });
 
-            if (!page) {
-                return undefined;
-            }
+        if (!page) {
+            return undefined;
+        }
 
-            const monitors = await db.query.statusPageMonitor.findMany({
-                where: eq(statusPageMonitor.statusPageId, page.id),
-                with: {
-                    monitor: true,
-                    group: true,
-                },
-                orderBy: [asc(statusPageMonitor.order)],
-            });
+        const monitors = await db.query.statusPageMonitor.findMany({
+            where: eq(statusPageMonitor.statusPageId, page.id),
+            with: {
+                monitor: true,
+                group: true,
+            },
+            orderBy: [asc(statusPageMonitor.order)],
+        });
 
-            return {
-                ...page,
-                monitors,
-            };
-        },
-    );
-};
+        return {
+            ...page,
+            monitors,
+        };
+    });
+});
 
 export const getStatusPageBySlug = cache(async (slug: string) => {
-    return cached(
-        `status-page:slug:${slug}`,
-        600, // 10 minutes
-        async () => {
-            const page = await db.query.statusPage.findFirst({
-                where: eq(statusPage.slug, slug),
-            });
+    return withRetry(async () => {
+        const page = await db.query.statusPage.findFirst({
+            where: eq(statusPage.slug, slug),
+        });
 
-            if (!page) {
-                return undefined;
-            }
+        if (!page) {
+            return undefined;
+        }
 
-            const monitors = await db.query.statusPageMonitor.findMany({
-                where: eq(statusPageMonitor.statusPageId, page.id),
-                with: {
-                    monitor: true,
-                    group: true,
-                },
-                orderBy: [asc(statusPageMonitor.order)],
-            });
+        const monitors = await db.query.statusPageMonitor.findMany({
+            where: eq(statusPageMonitor.statusPageId, page.id),
+            with: {
+                monitor: true,
+                group: true,
+            },
+            orderBy: [asc(statusPageMonitor.order)],
+        });
 
-            return {
-                ...page,
-                monitors,
-            };
-        },
-    );
+        return {
+            ...page,
+            monitors,
+        };
+    });
 });
 
 export const getActiveMaintenances = async (statusPageId: string) => {
-    return cached(
-        `active-maintenances:${statusPageId}`,
-        60, // 1 minute
-        async () =>
-            (
-                await getPublishedIncidentRecords(statusPageId, {
-                    maintenanceOnly: true,
-                })
-            )
-                .flatMap((record) => {
-                    const item = mapPublishedMaintenanceRecord(record);
-                    return item.status === "in_progress" ? [item] : [];
-                })
-                .sort(
-                    (a, b) =>
-                        new Date(b.startAt).getTime() -
-                        new Date(a.startAt).getTime(),
-                ),
+    return withRetry(async () =>
+        (
+            await getPublishedIncidentRecords(statusPageId, {
+                maintenanceOnly: true,
+            })
+        )
+            .flatMap((record) => {
+                const item = mapPublishedMaintenanceRecord(record);
+                return item.status === "in_progress" ? [item] : [];
+            })
+            .sort(
+                (a, b) =>
+                    new Date(b.startAt).getTime() -
+                    new Date(a.startAt).getTime(),
+            ),
     );
 };
 
 export const getScheduledMaintenances = async (statusPageId: string) => {
-    return cached(`scheduled-maintenances:${statusPageId}`, 60, async () => {
+    return withRetry(async () => {
         return (
             await getPublishedIncidentRecords(statusPageId, {
                 maintenanceOnly: true,
@@ -363,41 +315,35 @@ export const getScheduledMaintenances = async (statusPageId: string) => {
 };
 
 export const getActiveStatusPageReports = async (statusPageId: string) => {
-    return cached(
-        `active-status-page-reports:${statusPageId}`,
-        60, // 1 minute
-        async () =>
-            (
-                await getPublishedIncidentRecords(statusPageId, {
-                    activeOnly: true,
-                })
-            )
-                .map(mapPublishedIncidentRecord)
-                .sort(
-                    (a, b) =>
-                        new Date(b.startedAt).getTime() -
-                        new Date(a.startedAt).getTime(),
-                ),
+    return withRetry(async () =>
+        (
+            await getPublishedIncidentRecords(statusPageId, {
+                activeOnly: true,
+            })
+        )
+            .map(mapPublishedIncidentRecord)
+            .sort(
+                (a, b) =>
+                    new Date(b.startedAt).getTime() -
+                    new Date(a.startedAt).getTime(),
+            ),
     );
 };
 
 export const getStatusPageReports = async (statusPageId: string, limit = 5) => {
-    return cached(
-        `status-page-reports:${statusPageId}:limit:${limit}`,
-        60, // 1 minute
-        async () =>
-            (
-                await getPublishedIncidentRecords(statusPageId, {
-                    resolvedOnly: true,
-                    limit,
-                })
-            )
-                .map(mapPublishedIncidentRecord)
-                .sort(
-                    (a, b) =>
-                        new Date(b.startedAt).getTime() -
-                        new Date(a.startedAt).getTime(),
-                ),
+    return withRetry(async () =>
+        (
+            await getPublishedIncidentRecords(statusPageId, {
+                resolvedOnly: true,
+                limit,
+            })
+        )
+            .map(mapPublishedIncidentRecord)
+            .sort(
+                (a, b) =>
+                    new Date(b.startedAt).getTime() -
+                    new Date(a.startedAt).getTime(),
+            ),
     );
 };
 
@@ -405,23 +351,20 @@ export const getMaintenanceHistory = async (
     statusPageId: string,
     limit = 5,
 ) => {
-    return cached(
-        `maintenance-history:${statusPageId}:limit:${limit}`,
-        60, // 1 minute
-        async () =>
-            (
-                await getPublishedIncidentRecords(statusPageId, {
-                    maintenanceOnly: true,
-                    resolvedOnly: true,
-                })
+    return withRetry(async () =>
+        (
+            await getPublishedIncidentRecords(statusPageId, {
+                maintenanceOnly: true,
+                resolvedOnly: true,
+            })
+        )
+            .map(mapPublishedMaintenanceRecord)
+            .sort(
+                (a, b) =>
+                    new Date(b.endAt ?? b.startAt).getTime() -
+                    new Date(a.endAt ?? a.startAt).getTime(),
             )
-                .map(mapPublishedMaintenanceRecord)
-                .sort(
-                    (a, b) =>
-                        new Date(b.endAt ?? b.startAt).getTime() -
-                        new Date(a.endAt ?? a.startAt).getTime(),
-                )
-                .slice(0, limit),
+            .slice(0, limit),
     );
 };
 
@@ -437,25 +380,21 @@ export const getStatusPageReportsForPeriod = async (
     const { limit, period = "all" } = options;
     const cutoff = getIncidentHistoryCutoff(period);
 
-    return cached(
-        `status-page-reports:${statusPageId}:period:${period}:limit:${limit ?? "all"}`,
-        60,
-        async () => {
-            const records = await getPublishedIncidentRecords(statusPageId, {
-                resolvedOnly: true,
-                cutoff: cutoff ?? undefined,
-                limit,
-            });
+    return withRetry(async () => {
+        const records = await getPublishedIncidentRecords(statusPageId, {
+            resolvedOnly: true,
+            cutoff: cutoff ?? undefined,
+            limit,
+        });
 
-            return records
-                .map(mapPublishedIncidentRecord)
-                .sort(
-                    (a, b) =>
-                        new Date(b.startedAt).getTime() -
-                        new Date(a.startedAt).getTime(),
-                );
-        },
-    );
+        return records
+            .map(mapPublishedIncidentRecord)
+            .sort(
+                (a, b) =>
+                    new Date(b.startedAt).getTime() -
+                    new Date(a.startedAt).getTime(),
+            );
+    });
 };
 
 export const getMaintenanceHistoryForPeriod = async (
@@ -465,60 +404,50 @@ export const getMaintenanceHistoryForPeriod = async (
     const { limit, period = "all" } = options;
     const cutoff = getIncidentHistoryCutoff(period);
 
-    return cached(
-        `maintenance-history:${statusPageId}:period:${period}:limit:${limit ?? "all"}`,
-        60,
-        async () => {
-            const items = (
-                await getPublishedIncidentRecords(statusPageId, {
-                    maintenanceOnly: true,
-                    resolvedOnly: true,
-                    cutoff: cutoff ?? undefined,
-                })
-            )
-                .map(mapPublishedMaintenanceRecord)
-                .sort(
-                    (a, b) =>
-                        new Date(b.endAt ?? b.startAt).getTime() -
-                        new Date(a.endAt ?? a.startAt).getTime(),
-                );
+    return withRetry(async () => {
+        const items = (
+            await getPublishedIncidentRecords(statusPageId, {
+                maintenanceOnly: true,
+                resolvedOnly: true,
+                cutoff: cutoff ?? undefined,
+            })
+        )
+            .map(mapPublishedMaintenanceRecord)
+            .sort(
+                (a, b) =>
+                    new Date(b.endAt ?? b.startAt).getTime() -
+                    new Date(a.endAt ?? a.startAt).getTime(),
+            );
 
-            return limit ? items.slice(0, limit) : items;
-        },
-    );
+        return limit ? items.slice(0, limit) : items;
+    });
 };
 
 export const getMonitorStatus = async (monitorId: string) => {
-    return cached(
-        `monitor-status:${monitorId}`,
-        60, // 1 minute (was 30s)
-        async () => {
-            const monitorRecord = await db.query.monitor.findFirst({
-                where: eq(monitor.id, monitorId),
-                columns: {
-                    id: true,
-                    workerIds: true,
-                    locations: true,
-                },
-            });
+    return withRetry(async () => {
+        const monitorRecord = await db.query.monitor.findFirst({
+            where: eq(monitor.id, monitorId),
+            columns: {
+                id: true,
+                workerIds: true,
+                locations: true,
+            },
+        });
 
-            if (!monitorRecord) return undefined;
+        if (!monitorRecord) return undefined;
 
-            const [latestEvent, aggregateStatus] = await Promise.all([
-                timeseries.getLatestEventForMonitor(monitorId),
-                getAggregateMonitorStatusForMonitor({
-                    id: monitorRecord.id,
-                    workerIds:
-                        (monitorRecord.workerIds as string[] | null) ?? [],
-                    locations:
-                        (monitorRecord.locations as string[] | null) ?? [],
-                }),
-            ]);
+        const [latestEvent, aggregateStatus] = await Promise.all([
+            timeseries.getLatestEventForMonitor(monitorId),
+            getAggregateMonitorStatusForMonitor({
+                id: monitorRecord.id,
+                workerIds: (monitorRecord.workerIds as string[] | null) ?? [],
+                locations: (monitorRecord.locations as string[] | null) ?? [],
+            }),
+        ]);
 
-            return {
-                status: aggregateStatus.status,
-                timestamp: latestEvent?.timestamp,
-            };
-        },
-    );
+        return {
+            status: aggregateStatus.status,
+            timestamp: latestEvent?.timestamp,
+        };
+    });
 };

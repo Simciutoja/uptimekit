@@ -69,7 +69,6 @@
         "drizzle-orm": "catalog:",
         "effect": "^3.22.1",
         "evlog": "^2.24.0",
-        "ioredis": "^6.0.0",
         "nodemailer": "^9.0.4",
         "semver": "^7.8.5",
         "socket.io-client": "^4.8.3",

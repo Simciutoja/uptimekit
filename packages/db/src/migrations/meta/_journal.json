@@ -204,6 +204,13 @@
             "when": 1784005062095,
             "tag": "0028_black_spiral",
             "breakpoints": true
+        },
+        {
+            "idx": 29,
+            "version": "7",
+            "when": 1786256776454,
+            "tag": "0029_wandering_nova",
+            "breakpoints": true
         }
     ]
 }
